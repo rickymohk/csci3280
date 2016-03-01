@@ -33,21 +33,18 @@ namespace test1
 
         private void nextFrame(Object source, ElapsedEventArgs e)
         {
-            t.Dispose();
+            t.Stop();
             if (buf[buf_i] != null)
             {
                 pictureBox1.Image = buf[buf_i];
-                t = new System.Timers.Timer(duration);
-                t.Elapsed += nextFrame;
-                t.AutoReset = false;
-                t.Enabled = true;
+                t.Start();
                 buf[buf_i] = reader.ReadVideoFrame();
                 buf_i = 1 - buf_i;
             }
                 
             else
             {
-                t.Stop();
+                t.Dispose();
                 reader.Close();
             }
                 
