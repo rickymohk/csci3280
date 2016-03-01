@@ -56,6 +56,12 @@
     <Reference Include="AForge.Video.VFW">
       <HintPath>..\..\AForge.NET Framework-2.2.5-(libs only)\Release\AForge.Video.VFW.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio">
+      <HintPath>..\..\NAudio-Release\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.WindowsMediaFormat">
+      <HintPath>..\..\NAudio-Release\NAudio.WindowsMediaFormat.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -123,9 +129,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="postproc-52.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="sample_video.avi">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="swresample-0.dll">

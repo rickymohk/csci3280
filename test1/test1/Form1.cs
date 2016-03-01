@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using AForge.Video.FFMPEG;
 using System.Timers;
+using NAudio;
+using NAudio.Wave;
 
 namespace test1
 {
@@ -19,24 +21,28 @@ namespace test1
         private Bitmap[] buf;
         private double fps;
         private double duration;
+        private WaveStream wave;
+        private int buf_i;
 
         public Form1()
         {
             InitializeComponent();
-            
+            buf_i = 0;
+            buf = new Bitmap[2];
         }
 
         private void nextFrame(Object source, ElapsedEventArgs e)
         {
             t.Dispose();
-            Bitmap img = reader.ReadVideoFrame();
-            if (img != null)
+            if (buf[buf_i] != null)
             {
-                pictureBox1.Image = img;
+                pictureBox1.Image = buf[buf_i];
                 t = new System.Timers.Timer(duration);
                 t.Elapsed += nextFrame;
                 t.AutoReset = false;
                 t.Enabled = true;
+                buf[buf_i] = reader.ReadVideoFrame();
+                buf_i = 1 - buf_i;
             }
                 
             else
@@ -51,10 +57,12 @@ namespace test1
         {
             if(!reader.IsOpen)
             {
-                reader.Open("C:\\Users\\Ricky\\Documents\\cuhk\\CSCI\\3280\\SHE_uncompressed.avi");
+                reader.Open("H:\\SHE_uncompressed.avi");
+                buf[0] = reader.ReadVideoFrame();
+                buf[1] = reader.ReadVideoFrame();
             }
             fps = (double)reader.FrameRate;
-            duration = 1 / fps;
+            duration = 1 / fps * 1000;
             t = new System.Timers.Timer(duration);
             t.Elapsed += nextFrame;
             t.AutoReset = false;
