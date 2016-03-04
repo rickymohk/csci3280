@@ -41,7 +41,13 @@ namespace test1
         private AudioOutputDevice audio_out;
         private MemoryStream audio_stream;
         private int sample_rate, sample_size,channels;
+
+
+
         private Byte[][] abuf;
+
+
+
         private int abuf_size,abuf_i;
 
         public Form1()
@@ -160,7 +166,7 @@ namespace test1
 */
                 if (!reader.IsOpen)
                 {
-                    reader.Open("H:\\SHE_uncompressed.avi");
+                    reader.Open("D:\\SHE_uncompressed.avi");
                     if (reader.IsOpen)
                     {
                         max_frame = reader.FrameCount;
@@ -182,7 +188,7 @@ namespace test1
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)  
         {
             play("H:\\SHE_uncompressed.avi");
         }
@@ -190,6 +196,58 @@ namespace test1
         private void button2_Click(object sender, EventArgs e)
         {
             t.Stop();
+        }
+
+        private void openFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+            if (openFileDialog1.FileName != "")
+            {
+                if(openFileDialog1.FilterIndex==1) /*avi*/
+                {
+
+                }
+                else if(openFileDialog1.FilterIndex==2)            /*txt*/
+                {
+
+                }
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if(pictureBox1.Image != null)
+            {
+                saveScreenShot.ShowDialog();
+                if (saveScreenShot.FileName != "")
+                {
+                    FileStream fs = (FileStream)saveScreenShot.OpenFile();
+                    switch (saveScreenShot.FilterIndex)
+                    {
+                        case 1:
+                            pictureBox1.Image.Save(fs, System.Drawing.Imaging.ImageFormat.Jpeg);
+                            break;
+                        case 2:
+                            pictureBox1.Image.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+                            break;
+                        case 3:
+                            pictureBox1.Image.Save(fs, System.Drawing.Imaging.ImageFormat.Gif);
+                            break;
+                        case 4:
+                            pictureBox1.Image.Save(fs, System.Drawing.Imaging.ImageFormat.Png);
+                            break;
+
+                    }
+                    fs.Close();
+                    saveScreenShot.FileName = "";
+                }
+            }
+            else
+            {
+                MessageBox.Show("No video playing.");
+                
+            }
+
         }
     }
 }
