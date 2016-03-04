@@ -22,6 +22,7 @@ namespace test1
     {
         private Multimedia.Timer t;
         private AviManager manager;
+        private String avi_path;
         int avi;
 
         private bool hasAudio;
@@ -130,67 +131,102 @@ namespace test1
                         {
                             hasAudio = true;
                         }
-                    }
-                }
-/*
-                if(hasAudio)
-                {
-                    astream = manager.GetWaveStream();
-                    sample_rate = astream.CountSamplesPerSecond;
-                    sample_size = astream.CountBitsPerSample;
-                    channels = astream.CountChannels;
-                    abuf_size = duration * sample_rate * sample_size / 8000;
-                    float[] temp = new float[astreamLength / 4];
-                    waveData = astream.GetStreamData(ref astreamInfo, ref astreamFormat, ref astreamLength);
-                    Marshal.Copy(waveData, temp, astream_i, astreamLength/4-1);
-                    audio_out = new AudioOutputDevice(Handle, sample_rate, channels);
-                    audio_out.Play(temp);
+                        if (!reader.IsOpen)
+                        {
+                            try
+                            {
+                                reader.Open(avi_path);
+                            }
+                            catch (System.IO.IOException e)
+                            {
+                                if (e.Data.Equals("Cannot open Video file"))
+                                {
+                                    MessageBox.Show("Cannot open Video file");
+                                }
+                            }
 
-                    abuf_i = 0;
-                    abuf[0] = new Byte[abuf_size];
-                    abuf[1] = new Byte[abuf_size];
-                    astreamInfo = new Avi.AVISTREAMINFO();
-                    astreamFormat = new Avi.PCMWAVEFORMAT();
-                    waveData = astream.GetStreamData(ref astreamInfo, ref astreamFormat, ref astreamLength);
-                    Byte[] temp = new byte[astreamLength];
-                    Marshal.Copy(waveData, temp, astream_i, astreamLength);
-                    using (MemoryStream ms = new MemoryStream(temp))
+                            if (reader.IsOpen)
+                            {
+                                max_frame = reader.FrameCount;
+                                frame_i = 0;
+                                vbuf_i = 0;
+                                vbuf[0] = reader.ReadVideoFrame();
+                                vbuf[1] = reader.ReadVideoFrame();
+                                fps = reader.FrameRate;
+                                duration = 1000 / fps;
+                                t.Period = duration;
+                                t.Start();
+
+                            }
+                            else
+                            {
+                                MessageBox.Show("Cannot open Video file");
+                            }
+                        }
+                    }
+                    else
                     {
-                         SoundPlayer player = new SoundPlayer(audio_stream);
-                         player.Play();
+                        MessageBox.Show("Cannot open Video file");
                     }
-                    
-
 
                 }
-*/
-                if (!reader.IsOpen)
+                else
                 {
-                    reader.Open("D:\\SHE_uncompressed.avi");
-                    if (reader.IsOpen)
-                    {
-                        max_frame = reader.FrameCount;
-                        frame_i = 0;
-                        vbuf_i = 0;
-                        vbuf[0] = reader.ReadVideoFrame();
-                        vbuf[1] = reader.ReadVideoFrame();
-                        fps = reader.FrameRate;
-                        duration = 1000 / fps;
-                        t.Period = duration;
-
-                    }
+                    MessageBox.Show("Cannot open Video file");
                 }
+                /*
+                                if(hasAudio)
+                                {
+                                    astream = manager.GetWaveStream();
+                                    sample_rate = astream.CountSamplesPerSecond;
+                                    sample_size = astream.CountBitsPerSample;
+                                    channels = astream.CountChannels;
+                                    abuf_size = duration * sample_rate * sample_size / 8000;
+                                    float[] temp = new float[astreamLength / 4];
+                                    waveData = astream.GetStreamData(ref astreamInfo, ref astreamFormat, ref astreamLength);
+                                    Marshal.Copy(waveData, temp, astream_i, astreamLength/4-1);
+                                    audio_out = new AudioOutputDevice(Handle, sample_rate, channels);
+                                    audio_out.Play(temp);
+
+                                    abuf_i = 0;
+                                    abuf[0] = new Byte[abuf_size];
+                                    abuf[1] = new Byte[abuf_size];
+                                    astreamInfo = new Avi.AVISTREAMINFO();
+                                    astreamFormat = new Avi.PCMWAVEFORMAT();
+                                    waveData = astream.GetStreamData(ref astreamInfo, ref astreamFormat, ref astreamLength);
+                                    Byte[] temp = new byte[astreamLength];
+                                    Marshal.Copy(waveData, temp, astream_i, astreamLength);
+                                    using (MemoryStream ms = new MemoryStream(temp))
+                                    {
+                                         SoundPlayer player = new SoundPlayer(audio_stream);
+                                         player.Play();
+                                    }
+
+
+
+                                }
+                */
+
+
 
             }
-           t.Start();
+            else
+            {
+                t.Start();
+            }
 
 
 
         }
 
+        private void loadPlayList(string filepath)
+        {
+
+        }
+
         private void button1_Click(object sender, EventArgs e)  
         {
-            play("H:\\SHE_uncompressed.avi");
+            play(avi_path);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -205,11 +241,11 @@ namespace test1
             {
                 if(openFileDialog1.FilterIndex==1) /*avi*/
                 {
-
+                    avi_path = openFileDialog1.FileName;
                 }
                 else if(openFileDialog1.FilterIndex==2)            /*txt*/
                 {
-
+                    loadPlayList(openFileDialog1.FileName);
                 }
             }
         }
