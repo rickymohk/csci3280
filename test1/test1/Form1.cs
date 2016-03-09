@@ -51,6 +51,12 @@ namespace test1
 
         private int abuf_size,abuf_i;
 
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string file = listView1.SelectedItems[0].SubItems[3].Text;
+            avi_path = file;
+        }
+
         public Form1()
         {
             InitializeComponent();

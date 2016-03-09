@@ -28,9 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
+            "testtitle",
+            "testsinger",
+            "testalbum",
+            "h:\\SHE_uncompressed.avi"}, -1);
             this.saveScreenShot = new System.Windows.Forms.SaveFileDialog();
             this.button3 = new System.Windows.Forms.Button();
-            this.listBox1 = new System.Windows.Forms.ListBox();
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -39,6 +43,10 @@
             this.filesFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.Title = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Singer = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Album = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
@@ -53,31 +61,21 @@
             // button3
             // 
             this.button3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button3.Location = new System.Drawing.Point(275, 259);
+            this.button3.Location = new System.Drawing.Point(272, 259);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(130, 42);
+            this.button3.Size = new System.Drawing.Size(129, 42);
             this.button3.TabIndex = 5;
             this.button3.Text = "ScreenShot";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
-            // listBox1
-            // 
-            this.listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(411, 26);
-            this.listBox1.Name = "listBox1";
-            this.tableLayoutPanel1.SetRowSpan(this.listBox1, 3);
-            this.listBox1.Size = new System.Drawing.Size(197, 303);
-            this.listBox1.TabIndex = 4;
-            // 
             // button2
             // 
             this.button2.AutoSize = true;
             this.button2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button2.Location = new System.Drawing.Point(139, 259);
+            this.button2.Location = new System.Drawing.Point(137, 259);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(130, 42);
+            this.button2.Size = new System.Drawing.Size(129, 42);
             this.button2.TabIndex = 2;
             this.button2.Text = "Pause";
             this.button2.UseVisualStyleBackColor = true;
@@ -89,7 +87,7 @@
             this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.button1.Location = new System.Drawing.Point(3, 259);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(130, 42);
+            this.button1.Size = new System.Drawing.Size(128, 42);
             this.button1.TabIndex = 1;
             this.button1.Text = "Play";
             this.button1.UseVisualStyleBackColor = true;
@@ -102,7 +100,7 @@
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox1.Location = new System.Drawing.Point(3, 26);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(402, 227);
+            this.pictureBox1.Size = new System.Drawing.Size(398, 227);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
@@ -113,14 +111,14 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33332F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 201F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 206F));
             this.tableLayoutPanel1.Controls.Add(this.pictureBox1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.button1, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.button2, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.listBox1, 3, 1);
             this.tableLayoutPanel1.Controls.Add(this.button3, 2, 2);
             this.tableLayoutPanel1.Controls.Add(this.menuStrip1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.statusStrip1, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.listView1, 3, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -138,7 +136,7 @@
             this.filesFToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(136, 23);
+            this.menuStrip1.Size = new System.Drawing.Size(134, 23);
             this.menuStrip1.TabIndex = 7;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -149,13 +147,13 @@
             this.filesFToolStripMenuItem.Name = "filesFToolStripMenuItem";
             this.filesFToolStripMenuItem.ShortcutKeyDisplayString = "F";
             this.filesFToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F)));
-            this.filesFToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.filesFToolStripMenuItem.Size = new System.Drawing.Size(61, 19);
             this.filesFToolStripMenuItem.Text = "Files (F)";
             // 
             // openFileToolStripMenuItem
             // 
             this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
             this.openFileToolStripMenuItem.Text = "Open";
             this.openFileToolStripMenuItem.Click += new System.EventHandler(this.openFileToolStripMenuItem_Click);
             // 
@@ -164,9 +162,41 @@
             this.tableLayoutPanel1.SetColumnSpan(this.statusStrip1, 3);
             this.statusStrip1.Location = new System.Drawing.Point(0, 310);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(408, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(404, 22);
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // listView1
+            // 
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.Title,
+            this.Singer,
+            this.Album});
+            this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.listView1.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem1});
+            this.listView1.Location = new System.Drawing.Point(407, 26);
+            this.listView1.MultiSelect = false;
+            this.listView1.Name = "listView1";
+            this.tableLayoutPanel1.SetRowSpan(this.listView1, 3);
+            this.listView1.Size = new System.Drawing.Size(201, 303);
+            this.listView1.TabIndex = 8;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
+            this.listView1.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
+            // 
+            // Title
+            // 
+            this.Title.Text = "Title";
+            // 
+            // Singer
+            // 
+            this.Singer.Text = "Singer";
+            // 
+            // Album
+            // 
+            this.Album.Text = "Album";
             // 
             // openFileDialog1
             // 
@@ -194,7 +224,6 @@
         #endregion
         private System.Windows.Forms.SaveFileDialog saveScreenShot;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button button1;
@@ -204,6 +233,10 @@
         private System.Windows.Forms.ToolStripMenuItem filesFToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openFileToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.ColumnHeader Title;
+        private System.Windows.Forms.ColumnHeader Singer;
+        private System.Windows.Forms.ColumnHeader Album;
     }
 }
 
