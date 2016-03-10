@@ -53,8 +53,13 @@ namespace test1
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string file = listView1.SelectedItems[0].SubItems[3].Text;
-            avi_path = file;
+            String file = listView1.SelectedItems[0].SubItems[3].Text;
+            if(avi_path != file)
+            {
+                avi_path = file;
+                avi = 0;
+            }
+            
         }
 
         public Form1()
