@@ -108,6 +108,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Timer.cs" />
     <Compile Include="VideoStream.cs" />
+    <Compile Include="WaveNative.cs" />
+    <Compile Include="WaveOut.cs" />
+    <Compile Include="WaveStream.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
