@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="WaveOut.cs" company="(none)">
+// <copyright file="WaveIn.cs" company="(none)">
 //  Copyright (c) 2009 John Gietzen
 //
 //  Permission is hereby granted, free of charge, to any person obtaining
@@ -36,29 +36,19 @@ namespace WinMM
     using System.Xml;
 
     /// <summary>
-    /// Encapsulates the waveOut commands in the <see cref="NativeMethods"/> class (from winmm.dll).  This provides a familiar format for using the WaveOut tools.
+    /// Encapsulates the waveIn commands in the <see cref="NativeMethods"/> class (from winmm.dll).  This provides a familiar format for using the WaveIn tools.
     /// </summary>
-    public sealed class WaveOut : IDisposable
+    public sealed class WaveIn : IDisposable
     {
         /// <summary>
         /// Indicates the DeviceID of the Microsoft Wave Mapper device.
         /// </summary>
-        public const int WaveOutMapperDeviceId = -1;
+        public const int WaveInMapperDeviceId = -1;
 
         /// <summary>
         /// Holds a list of manufactureres, read lazily from the assembly's resources.
         /// </summary>
         private static XmlDocument manufacturers;
-
-        /// <summary>
-        /// Holds this device's DeviceID.
-        /// </summary>
-        private int deviceId;
-
-        /// <summary>
-        /// Holds the device's capabilities.
-        /// </summary>
-        private WaveOutDeviceCaps capabilities;
 
         /// <summary>
         /// Hold a locking object for start/stop synchronization.
@@ -71,9 +61,24 @@ namespace WinMM
         private object bufferingLock = new object();
 
         /// <summary>
+        /// Holds the current recording format.
+        /// </summary>
+        private WaveFormat recordingFormat;
+
+        /// <summary>
         /// Holds a flag indicating whether or not we are currently buffering.
         /// </summary>
         private bool buffering;
+
+        /// <summary>
+        /// Holds the number of samples to hold in each buffer in the queue.
+        /// </summary>
+        private int bufferSize = 200;
+
+        /// <summary>
+        /// Holds the size of the buffer queue size in buffers.
+        /// </summary>
+        private int bufferQueueSize = 30;
 
         /// <summary>
         /// Holds the number of buffers currently in the queue.
@@ -91,9 +96,14 @@ namespace WinMM
         private Thread bufferMaintainerThread;
 
         /// <summary>
+        /// Holds this device's DeviceID.
+        /// </summary>
+        private int deviceId;
+
+        /// <summary>
         /// Holds the handle to the device.
         /// </summary>
-        private WaveOutSafeHandle handle;
+        private WaveInSafeHandle handle;
 
         /// <summary>
         /// Holds a reference to our our own callback.
@@ -101,162 +111,87 @@ namespace WinMM
         /// <remarks>
         /// We assign this a value in the constructor, and maintain it until at lease after either
         /// Dispose or the Finalizer is called to prevent the garbage collector from finalizing
-        /// the instance we pass to the <see cref="NativeMethods.waveOutOpen"/> method.
+        /// the instance we pass to the <see cref="NativeMethods.waveInOpen"/> method.
         /// </remarks>
-        private NativeMethods.waveOutProc callback;
+        private NativeMethods.waveInProc callback;
 
         /// <summary>
-        /// Initializes a new instance of the WaveOut class, based on an available Device Id.
+        /// Initializes a new instance of the WaveIn class, based on an available Device Id.
         /// </summary>
         /// <param name="deviceId">The device identifier to obtain.</param>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="deviceId"/> is not in the valid range.</exception>
-        public WaveOut(int deviceId)
+        public WaveIn(int deviceId)
         {
-            if (deviceId >= DeviceCount && deviceId != WaveOutMapperDeviceId)
+            if (deviceId >= DeviceCount && deviceId != WaveInMapperDeviceId)
             {
                 throw new ArgumentOutOfRangeException("deviceId", "The Device ID specified was not within the valid range.");
             }
 
-            this.callback = new NativeMethods.waveOutProc(this.InternalCallback);
+            this.callback = new NativeMethods.waveInProc(this.InternalCallback);
 
             this.deviceId = (int)deviceId;
         }
 
         /// <summary>
-        /// Finalizes an instance of the WaveOut class and disposes of the native resources used by the instance.
+        /// Finalizes an instance of the WaveIn class and disposes of the native resources used by the instance.
         /// </summary>
-        ~WaveOut()
+        ~WaveIn()
         {
             this.Dispose(false);
         }
 
         /// <summary>
-        /// Called when the device recieves a message from the system.
+        /// Called when the system returns from the device.
         /// </summary>
-        public event EventHandler<WaveOutMessageReceivedEventArgs> MessageReceived;
+        public event EventHandler<DataReadyEventArgs> DataReady;
 
         /// <summary>
         /// Gets the devices offered by the system.
         /// </summary>
-        public static ReadOnlyCollection<WaveOutDeviceCaps> Devices
+        public static ReadOnlyCollection<WaveInDeviceCaps> Devices
         {
             get { return GetAllDeviceCaps().AsReadOnly(); }
         }
 
         /// <summary>
-        /// Gets this device's capabilities.
+        /// Gets or sets the size of the internal input buffers, in samples.
         /// </summary>
-        public WaveOutDeviceCaps Capabilities
+        public int BufferSize
         {
             get
             {
-                if (this.capabilities == null)
-                {
-                    this.capabilities = GetDeviceCaps(this.deviceId);
-                }
-
-                return this.capabilities;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the stereo volume of the device.
-        /// </summary>
-        /// <remarks>
-        /// If the device does not support sereo volume, the left channel will be used for the mono volume.
-        /// </remarks>
-        public Volume Volume
-        {
-            get
-            {
-                uint volume = 0;
-                if (this.handle != null && !this.handle.IsInvalid && !this.handle.IsClosed)
-                {
-                    NativeMethods.Throw(
-                        NativeMethods.waveOutGetVolume(this.handle, ref volume),
-                        NativeMethods.ErrorSource.WaveOut);
-                }
-                else
-                {
-                    NativeMethods.Throw(
-                        NativeMethods.waveOutGetVolume((UIntPtr)(uint)this.deviceId, ref volume),
-                        NativeMethods.ErrorSource.WaveOut);
-                }
-
-                uint left = volume & (uint)0xFFFF;
-                uint right = volume >> 16;
-                Volume ret = new Volume();
-                ret.Left = (float)left / UInt16.MaxValue;
-                ret.Right = (float)right / UInt16.MaxValue;
-                return ret;
+                return this.bufferSize;
             }
 
             set
             {
-                float leftVolume = Math.Min(Math.Max(value.Left, 0.0f), 1.0f);
-                float rightVolume = Math.Min(Math.Max(value.Right, 0.0f), 1.0f);
-                uint left = (uint)(UInt16.MaxValue * leftVolume);
-                uint right = (uint)(UInt16.MaxValue * rightVolume);
-                uint volume = left | (right << 16);
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException("value", "The value you specified is too small");
+                }
 
-                if (this.handle != null && !this.handle.IsInvalid && !this.handle.IsClosed)
-                {
-                    NativeMethods.Throw(
-                        NativeMethods.waveOutSetVolume(this.handle, volume),
-                        NativeMethods.ErrorSource.WaveOut);
-                }
-                else
-                {
-                    NativeMethods.Throw(
-                        NativeMethods.waveOutSetVolume((UIntPtr)(uint)this.deviceId, volume),
-                        NativeMethods.ErrorSource.WaveOut);
-                }
+                this.bufferSize = value;
             }
         }
 
         /// <summary>
-        /// Gets or sets the pitch modifier ratio.  This is not supported on all devices.
+        /// Gets or sets the number of internal input buffers to enqueue at the device level.
         /// </summary>
-        public float Pitch
+        public int BufferQueueSize
         {
             get
             {
-                uint pitch = 0;
-                NativeMethods.Throw(
-                    NativeMethods.waveOutGetPitch(this.handle, ref pitch),
-                    NativeMethods.ErrorSource.WaveOut);
-
-                return FixedToFloat(pitch);
+                return this.bufferQueueSize;
             }
 
             set
             {
-                NativeMethods.Throw(
-                    NativeMethods.waveOutSetPitch(this.handle, FloatToFixed(value)),
-                    NativeMethods.ErrorSource.WaveOut);
-            }
-        }
+                if (this.bufferQueueSize <= 0)
+                {
+                    throw new ArgumentOutOfRangeException("value", "The value you specified is too small");
+                }
 
-        /// <summary>
-        /// Gets or sets the playback rate modifier ratio.  This is not supported on all devices.
-        /// </summary>
-        public float PlaybackRate
-        {
-            get
-            {
-                uint rate = 0;
-                NativeMethods.Throw(
-                    NativeMethods.waveOutGetPlaybackRate(this.handle, ref rate),
-                    NativeMethods.ErrorSource.WaveOut);
-
-                return FixedToFloat(rate);
-            }
-
-            set
-            {
-                NativeMethods.Throw(
-                    NativeMethods.waveOutSetPlaybackRate(this.handle, FloatToFixed(value)),
-                    NativeMethods.ErrorSource.WaveOut);
+                this.bufferQueueSize = value;
             }
         }
 
@@ -267,7 +202,7 @@ namespace WinMM
         {
             get
             {
-                return (int)NativeMethods.waveOutGetNumDevs();
+                return (int)NativeMethods.waveInGetNumDevs();
             }
         }
 
@@ -311,9 +246,11 @@ namespace WinMM
                 wfx.nSamplesPerSec = waveFormat.SamplesPerSecond;
                 wfx.cbSize = 0;
 
+                this.recordingFormat = waveFormat.Clone();
+
                 IntPtr tempHandle = new IntPtr();
                 NativeMethods.Throw(
-                    NativeMethods.waveOutOpen(
+                    NativeMethods.waveInOpen(
                         ref tempHandle,
                         (uint)this.deviceId,
                         ref wfx,
@@ -321,24 +258,16 @@ namespace WinMM
                         (IntPtr)0,
                         NativeMethods.WAVEOPENFLAGS.CALLBACK_FUNCTION | NativeMethods.WAVEOPENFLAGS.WAVE_FORMAT_DIRECT),
                     NativeMethods.ErrorSource.WaveOut);
-                this.handle = new WaveOutSafeHandle(tempHandle);
-
-                lock (this.bufferingLock)
-                {
-                    this.buffering = true;
-                    Monitor.Pulse(this.bufferingLock);
-                }
-
-                this.bufferMaintainerThread = new Thread(new ThreadStart(this.MaintainBuffers));
-                this.bufferMaintainerThread.IsBackground = true;
-                this.bufferMaintainerThread.Name = "WaveOut MaintainBuffers thread. (DeviceID = " + this.deviceId + ")";
-                this.bufferMaintainerThread.Start();
+                this.handle = new WaveInSafeHandle(tempHandle);
             }
         }
 
         /// <summary>
         /// Closes the device.  If the device is playing, playback is stopped.
         /// </summary>
+        /// <remarks>
+        /// If the device is not currently open, this function does nothing.
+        /// </remarks>
         public void Close()
         {
             lock (this.startStopLock)
@@ -348,94 +277,68 @@ namespace WinMM
                     if (!this.handle.IsClosed && !this.handle.IsInvalid)
                     {
                         this.Stop();
-
-                        lock (this.bufferingLock)
-                        {
-                            this.buffering = false;
-                            Monitor.Pulse(this.bufferingLock);
-                        }
-
-                        this.bufferMaintainerThread.Join();
-
                         this.handle.Close();
-                        this.handle = null;
                     }
+
+                    this.handle = null;
                 }
             }
         }
 
         /// <summary>
-        /// Writes a block of data (in the current forma, set during Open) to the device.
+        /// Begins recording.
         /// </summary>
-        /// <param name="bufferData">The data to send to the device.</param>
-        public void Write(byte[] bufferData)
+        public void Start()
         {
             lock (this.startStopLock)
             {
-                IntPtr mem = Marshal.AllocHGlobal(bufferData.Length);
-                Marshal.Copy(bufferData, 0, mem, bufferData.Length);
-
-                NativeMethods.WAVEHDR pwh = new NativeMethods.WAVEHDR();
-                pwh.dwBufferLength = (uint)bufferData.Length;
-                pwh.dwFlags = 0;
-                pwh.lpData = mem;
-                pwh.dwUser = new IntPtr(12345);
-
-                IntPtr header = Marshal.AllocHGlobal(Marshal.SizeOf(pwh));
-                Marshal.StructureToPtr(pwh, header, false);
-
-                NativeMethods.Throw(
-                    NativeMethods.waveOutPrepareHeader(this.handle, header, (uint)Marshal.SizeOf(typeof(NativeMethods.WAVEHDR))),
-                    NativeMethods.ErrorSource.WaveOut);
-
-                NativeMethods.Throw(
-                    NativeMethods.waveOutWrite(this.handle, header, (uint)Marshal.SizeOf(typeof(NativeMethods.WAVEHDR))),
-                    NativeMethods.ErrorSource.WaveOut);
+                if (this.bufferMaintainerThread != null)
+                {
+                    throw new InvalidOperationException("The device has already been started.");
+                }
 
                 lock (this.bufferingLock)
                 {
-                    this.bufferQueueCount++;
+                    this.buffering = true;
                     Monitor.Pulse(this.bufferingLock);
                 }
-            }
-        }
 
-        /// <summary>
-        /// Pauses playback.  If playback is already paused, this does nothing.
-        /// </summary>
-        public void Pause()
-        {
-            lock (this.startStopLock)
-            {
+                this.bufferMaintainerThread = new Thread(new ThreadStart(this.MaintainBuffers));
+                this.bufferMaintainerThread.IsBackground = true;
+                this.bufferMaintainerThread.Name = "WaveIn MaintainBuffers thread. (DeviceID = " + this.deviceId + ")";
+                this.bufferMaintainerThread.Start();
+
                 NativeMethods.Throw(
-                    NativeMethods.waveOutPause(this.handle),
-                    NativeMethods.ErrorSource.WaveOut);
+                    NativeMethods.waveInStart(this.handle),
+                    NativeMethods.ErrorSource.WaveIn);
             }
         }
 
         /// <summary>
-        /// Resumes playback.  If playback is already in progress, this does nothing.
+        /// Stops recording.
         /// </summary>
-        public void Resume()
-        {
-            lock (this.startStopLock)
-            {
-                NativeMethods.Throw(
-                    NativeMethods.waveOutRestart(this.handle),
-                    NativeMethods.ErrorSource.WaveOut);
-            }
-        }
-
-        /// <summary>
-        /// Stops playback.
-        /// </summary>
+        /// <remarks>
+        /// If the device is not currently started, this call does nothing.
+        /// </remarks>
         public void Stop()
         {
             lock (this.startStopLock)
             {
-                NativeMethods.Throw(
-                    NativeMethods.waveOutReset(this.handle),
-                    NativeMethods.ErrorSource.WaveOut);
+                if (this.bufferMaintainerThread != null)
+                {
+                    lock (this.bufferingLock)
+                    {
+                        this.buffering = false;
+                        Monitor.Pulse(this.bufferingLock);
+                    }
+
+                    NativeMethods.Throw(
+                        NativeMethods.waveInReset(this.handle),
+                        NativeMethods.ErrorSource.WaveIn);
+
+                    this.bufferMaintainerThread.Join();
+                    this.bufferMaintainerThread = null;
+                }
             }
         }
 
@@ -456,7 +359,7 @@ namespace WinMM
             wfx.cbSize = 0;
 
             IntPtr dummy = new IntPtr(0);
-            NativeMethods.MMSYSERROR ret = NativeMethods.waveOutOpen(
+            NativeMethods.MMSYSERROR ret = NativeMethods.waveInOpen(
                 ref dummy,
                 (uint)this.deviceId,
                 ref wfx,
@@ -474,7 +377,7 @@ namespace WinMM
             }
             else
             {
-                NativeMethods.Throw(ret, NativeMethods.ErrorSource.WaveOut);
+                NativeMethods.Throw(ret, NativeMethods.ErrorSource.WaveIn);
                 return false;
             }
         }
@@ -493,18 +396,17 @@ namespace WinMM
         /// </summary>
         /// <param name="deviceId">The DeviceID for which to retrieve the capabilities.</param>
         /// <returns>The capabilities of the device.</returns>
-        private static WaveOutDeviceCaps GetDeviceCaps(int deviceId)
+        private static WaveInDeviceCaps GetDeviceCaps(int deviceId)
         {
-            NativeMethods.WAVEOUTCAPS wocaps = new NativeMethods.WAVEOUTCAPS();
-            NativeMethods.waveOutGetDevCaps(new UIntPtr((uint)deviceId), ref wocaps, (uint)Marshal.SizeOf(wocaps.GetType()));
-            WaveOutDeviceCaps caps = new WaveOutDeviceCaps();
+            NativeMethods.WAVEINCAPS wicaps = new NativeMethods.WAVEINCAPS();
+            NativeMethods.waveInGetDevCaps(new UIntPtr((uint)deviceId), ref wicaps, (uint)Marshal.SizeOf(wicaps.GetType()));
+            WaveInDeviceCaps caps = new WaveInDeviceCaps();
             caps.DeviceId = (int)deviceId;
-            caps.Channels = wocaps.wChannels;
-            caps.DriverVersion = (int)wocaps.vDriverVersion;
-            caps.Manufacturer = GetManufacturer(wocaps.wMid);
-            caps.Name = wocaps.szPname;
-            caps.ProductId = wocaps.wPid;
-            caps.Capabilities = wocaps.dwSupport;
+            caps.Channels = wicaps.wChannels;
+            caps.DriverVersion = (int)wicaps.vDriverVersion;
+            caps.Manufacturer = GetManufacturer(wicaps.wMid);
+            caps.Name = wicaps.szPname;
+            caps.ProductId = wicaps.wPid;
 
             return caps;
         }
@@ -523,7 +425,7 @@ namespace WinMM
             {
                 man = (XmlElement)manufacturers.SelectSingleNode("/devices/manufacturer[@id='" + manufacturerId.ToString(CultureInfo.InvariantCulture) + "']");
             }
-            
+
             if (man == null)
             {
                 return "Unknown [" + manufacturerId + "]";
@@ -533,74 +435,22 @@ namespace WinMM
         }
 
         /// <summary>
-        /// Converts a floating point number to a 32-bit fixed point number.
-        /// </summary>
-        /// <param name="value">The floating point number to convert.</param>
-        /// <returns>A 32-bit fixed point number.</returns>
-        private static uint FloatToFixed(float value)
-        {
-            short whole = (short)value;
-            ushort fraction = (ushort)((value - whole) * ushort.MaxValue);
-
-            return (((uint)whole) << 8) | (((uint)fraction) >> 8);
-        }
-
-        /// <summary>
-        /// Converts a 32-bit fixed point number number to a floating point.
-        /// </summary>
-        /// <param name="value">The 32-bit fixed point number to convert.</param>
-        /// <returns>A floating point number.</returns>
-        private static float FixedToFloat(uint value)
-        {
-            short whole = (short)(value >> 8);
-            ushort fraction = (ushort)value;
-
-            return (float)whole + (((float)fraction) / ushort.MaxValue);
-        }
-
-        /// <summary>
         /// Retrieves a list of the capabilities of all of the devices registered on the system.
         /// </summary>
         /// <returns>A list of the capabilities of all of the devices registered on the system.</returns>
-        private static List<WaveOutDeviceCaps> GetAllDeviceCaps()
+        private static List<WaveInDeviceCaps> GetAllDeviceCaps()
         {
-            List<WaveOutDeviceCaps> devices = new List<WaveOutDeviceCaps>();
+            List<WaveInDeviceCaps> devices = new List<WaveInDeviceCaps>();
             int count = DeviceCount;
-            
+
             for (int i = 0; i < count; i++)
             {
                 devices.Add(GetDeviceCaps(i));
             }
 
-            devices.Add(GetDeviceCaps(WaveOutMapperDeviceId));
+            devices.Add(GetDeviceCaps(WaveInMapperDeviceId));
 
             return devices;
-        }
-
-        /// <summary>
-        /// Fires when the operating system has a message about a device.
-        /// </summary>
-        /// <param name="waveOutHandle">A handle to the device on which the message has been fired.</param>
-        /// <param name="message">The message to be processed.</param>
-        /// <param name="instance">A user instance value.</param>
-        /// <param name="param1">Message parameter one.</param>
-        /// <param name="param2">Message parameter two.</param>
-        private void InternalCallback(IntPtr waveOutHandle, NativeMethods.WAVEOUTMESSAGE message, IntPtr instance, IntPtr param1, IntPtr param2)
-        {
-            if (message == NativeMethods.WAVEOUTMESSAGE.WOM_DONE)
-            {
-                lock (this.bufferingLock)
-                {
-                    this.bufferReleaseQueue.Enqueue(param1);
-                    this.bufferQueueCount--;
-                    Monitor.Pulse(this.bufferingLock);
-                }
-            }
-
-            if (this.MessageReceived != null)
-            {
-                this.MessageReceived(this, new WaveOutMessageReceivedEventArgs((WaveOutMessage)message));
-            }
         }
 
         /// <summary>
@@ -610,11 +460,32 @@ namespace WinMM
         {
             try
             {
-                while (this.buffering || this.bufferQueueCount > 0 || this.bufferReleaseQueue.Count > 0)
+                while (this.buffering)
                 {
                     lock (this.bufferingLock)
                     {
-                        while (this.bufferReleaseQueue.Count == 0 && (this.bufferQueueCount > 0 || this.buffering))
+                        while ((this.bufferQueueCount >= this.bufferQueueSize && this.bufferReleaseQueue.Count == 0) && this.buffering)
+                        {
+                            Monitor.Wait(this.bufferingLock);
+                        }
+                    }
+
+                    while (this.bufferQueueCount < this.bufferQueueSize && this.buffering)
+                    {
+                        this.AddBuffer();
+                    }
+
+                    while (this.bufferReleaseQueue.Count > 0)
+                    {
+                        this.ProcessDone();
+                    }
+                }
+
+                while (this.bufferReleaseQueue.Count > 0 || this.bufferQueueCount > 0)
+                {
+                    lock (this.bufferingLock)
+                    {
+                        while (this.bufferReleaseQueue.Count == 0)
                         {
                             Monitor.Wait(this.bufferingLock, 1000);
                         }
@@ -632,7 +503,44 @@ namespace WinMM
         }
 
         /// <summary>
-        /// Frees buffers that have been used by the application.
+        /// Adds a buffer to the queue.
+        /// </summary>
+        private void AddBuffer()
+        {
+            // Allocate unmanaged memory for the buffer
+            int bufferLength = this.bufferSize * this.recordingFormat.BlockAlign;
+            IntPtr mem = Marshal.AllocHGlobal(bufferLength);
+
+            // Initialize the buffer header, including a reference to the buffer memory
+            NativeMethods.WAVEHDR pwh = new NativeMethods.WAVEHDR();
+            pwh.dwBufferLength = (uint)bufferLength;
+            pwh.dwFlags = 0;
+            pwh.lpData = mem;
+            pwh.dwUser = new IntPtr(12345);
+
+            // Copy the header into unmanaged memory
+            IntPtr header = Marshal.AllocHGlobal(Marshal.SizeOf(pwh));
+            Marshal.StructureToPtr(pwh, header, false);
+
+            // Prepare the header
+            NativeMethods.Throw(
+                NativeMethods.waveInPrepareHeader(this.handle, header, (uint)Marshal.SizeOf(typeof(NativeMethods.WAVEHDR))),
+                NativeMethods.ErrorSource.WaveOut);
+
+            // Add the buffer to the device
+            NativeMethods.Throw(
+                NativeMethods.waveInAddBuffer(this.handle, header, (uint)Marshal.SizeOf(typeof(NativeMethods.WAVEHDR))),
+                NativeMethods.ErrorSource.WaveOut);
+
+            lock (this.bufferingLock)
+            {
+                this.bufferQueueCount++;
+                Monitor.Pulse(this.bufferingLock);
+            }
+        }
+
+        /// <summary>
+        /// Processes data and frees buffers that have been used by the application.
         /// </summary>
         private void ProcessDone()
         {
@@ -646,14 +554,47 @@ namespace WinMM
             }
 
             NativeMethods.WAVEHDR pwh = (NativeMethods.WAVEHDR)Marshal.PtrToStructure(header, typeof(NativeMethods.WAVEHDR));
+
+            // Find and copy the buffer data
             IntPtr data = pwh.lpData;
 
-            NativeMethods.Throw(
-                NativeMethods.waveOutUnprepareHeader(this.handle, header, (uint)Marshal.SizeOf(typeof(NativeMethods.WAVEHDR))),
-                NativeMethods.ErrorSource.WaveOut);
+            // Copy the data and fire the DataReady event if necessary
+            if (pwh.dwBytesRecorded > 0 && this.DataReady != null)
+            {
+                byte[] newData = new byte[pwh.dwBytesRecorded];
+                Marshal.Copy(data, newData, 0, (int)pwh.dwBytesRecorded);
+                this.DataReady(this, new DataReadyEventArgs(newData));
+            }
 
+            // Unprepare the header
+            NativeMethods.Throw(
+                NativeMethods.waveInUnprepareHeader(this.handle, header, (uint)Marshal.SizeOf(typeof(NativeMethods.WAVEHDR))),
+                NativeMethods.ErrorSource.WaveIn);
+
+            // Free the unmanaged memory
             Marshal.FreeHGlobal(data);
             Marshal.FreeHGlobal(header);
+        }
+
+        /// <summary>
+        /// Fires when the operating system has a message about a device.
+        /// </summary>
+        /// <param name="waveInHandle">A handle to the device on which the message has been fired.</param>
+        /// <param name="message">The message to be processed.</param>
+        /// <param name="instance">A user instance value.</param>
+        /// <param name="param1">Message parameter one.</param>
+        /// <param name="param2">Message parameter two.</param>
+        private void InternalCallback(IntPtr waveInHandle, NativeMethods.WAVEINMESSAGE message, IntPtr instance, IntPtr param1, IntPtr param2)
+        {
+            if (message == NativeMethods.WAVEINMESSAGE.MM_WIM_DATA)
+            {
+                lock (this.bufferingLock)
+                {
+                    this.bufferReleaseQueue.Enqueue(param1);
+                    this.bufferQueueCount--;
+                    Monitor.Pulse(this.bufferingLock);
+                }
+            }
         }
 
         /// <summary>

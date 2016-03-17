@@ -14,7 +14,7 @@ using AForge.Video.FFMPEG;
 using Multimedia;
 using AviFile;
 using Accord.DirectSound;
-using WaveLib;
+using WinMM;
 
 namespace test1
 {
@@ -26,11 +26,13 @@ namespace test1
 
         private bool hasAudio;
         //        private AudioOutputDevice aPlayer;
-        private WaveOutPlayer aPlayer;
+        private WaveOut aPlayer;
         private IntPtr astream,wavedata;     //ppavi
         private Avi.AVISTREAMINFO astreamInfo;
-        private int sample_rate, sample_size, channels;
+        private int sample_rate, sample_size, channels, lsamples;
+        private WaveFormat wf;
         private int lstart,len, astream_i;
+        private IntPtr temp1, temp2;
 
         private VideoFileReader reader;
         private Bitmap[] vbuf;
@@ -71,13 +73,15 @@ namespace test1
             t.Tick += new System.EventHandler(this.nextFrame);
             t.SynchronizingObject = this;
             t.Mode = TimerMode.Periodic;
+            temp1 = Marshal.AllocHGlobal(4);
+            temp2 = Marshal.AllocHGlobal(4);
             count = count2 = 0;
         }
 
         private void nextFrame(Object source, System.EventArgs e)
         {
-            toolStripStatusLabel1.Text = (count).ToString();
-            toolStripStatusLabel2.Text = (count).ToString();
+            toolStripStatusLabel1.Text = astream_i.ToString();
+            toolStripStatusLabel2.Text = (lstart + len).ToString();
             if (vbuf[vbuf_i] != null)
             {
 
@@ -118,39 +122,18 @@ namespace test1
                             abuf_i = 1 - abuf_i;
                         }
             */
-            
-                
-        }
 
-        private void aStop()
-        {
-            if (aPlayer != null)
-            {
-                try
-                {
-                    aPlayer.Dispose();
-                } 
-                finally
-                {
-                    aPlayer = null;
-                }
-            }
-
-        }
-       
-        private void afiller(IntPtr data, int size)
-        {
-            // toolStripStatusLabel1.Text = (count++).ToString();
-            count++;
             if (abuf[abuf_i] != null)
+            //     if(true)
             {
                 count2++;
-                Marshal.Copy(abuf[abuf_i], 0, data, size);
-              
-                if (astream != null && astream_i<lstart+len)
+                //        Marshal.Copy(abuf[abuf_i], 0, data, size);
+                aPlayer.Write(abuf[abuf_i]);
+                if (astream != null && astream_i < lstart + len)
                 {
-                    Avi.AVIStreamRead(astream, astream_i, abuf_size / (sample_size / 8) / channels, wavedata, abuf_size, 0, 0);
-                    astream_i += abuf_size / (sample_size / 8) / channels;
+                    count++;
+                    Avi.AVIStreamRead(astream, astream_i, lsamples, wavedata, abuf_size, temp1.ToInt32(), temp2.ToInt32());
+                    astream_i += lsamples;
                     Marshal.Copy(wavedata, abuf[abuf_i], 0, abuf_size);
                 }
                 else
@@ -170,6 +153,21 @@ namespace test1
             }
             abuf_i = 1 - abuf_i;
 
+
+        }
+
+        private void aStop()
+        {
+            
+            if (aPlayer != null)
+            {
+                try
+                {
+                    aPlayer.Stop();
+                }
+                catch { }
+            }
+            
         }
        
         
@@ -224,11 +222,17 @@ namespace test1
             aStop();
             if(astream != null)
             {
-                
-               // aPlayer = new AudioOutputDevice(Handle, sample_rate, channels);
-               // aPlayer.NewFrameRequested += new EventHandler<Accord.Audio.NewFrameRequestedEventArgs>(afiller);
-               // aPlayer.Play();
-                 aPlayer = new WaveOutPlayer(-1,new WaveFormat(sample_rate,sample_size,channels),abuf_size,3,new BufferFillEventHandler(afiller));
+
+                // aPlayer = new AudioOutputDevice(Handle, sample_rate, channels);
+                // aPlayer.NewFrameRequested += new EventHandler<Accord.Audio.NewFrameRequestedEventArgs>(afiller);
+                // aPlayer.Play();
+                aPlayer = new WaveOut(-1);
+                wf = new WaveFormat();
+                wf.Channels = (short)channels;
+                wf.BitsPerSample = (short)sample_size;
+                wf.FormatTag = WaveFormatTag.Pcm;
+                wf.SamplesPerSecond = sample_rate;
+                aPlayer.Open(wf);
             }
         }
 
@@ -305,7 +309,7 @@ namespace test1
                     
                     len = Avi.AVIStreamLength(astream.ToInt32())*sample_size;
                     abuf_size = channels * duration * sample_rate * sample_size / 8000;
-                    
+                    lsamples = 8 * abuf_size / sample_size / channels;
                     /*              
                                    abuf[0] = new Byte[abuf_size];
                                    abuf[1] = new Byte[abuf_size];
@@ -315,13 +319,13 @@ namespace test1
                     if (wavedata != null) 
                         Marshal.FreeHGlobal(wavedata);
                     wavedata = Marshal.AllocHGlobal(abuf_size);
-                    Avi.AVIStreamRead(astream, astream_i, 8*abuf_size / sample_size / channels , wavedata, abuf_size, 0, 0);
-                    astream_i += 8*abuf_size / sample_size  / channels;
+                    Avi.AVIStreamRead(astream, astream_i, lsamples, wavedata, abuf_size, 0, 0);
+                    astream_i += lsamples;
                     Marshal.Copy(wavedata, abuf[0], 0, abuf_size);
-                    Avi.AVIStreamRead(astream, astream_i, 8*abuf_size / sample_size  / channels , wavedata, abuf_size, 0, 0);
-                    astream_i += 8*abuf_size / sample_size/ channels;
+                    Avi.AVIStreamRead(astream, astream_i, lsamples, wavedata, abuf_size, 0, 0);
+                    astream_i += lsamples;
                     Marshal.Copy(wavedata, abuf[1], 0, abuf_size);
-                    abuf_i = 0;
+                    abuf_i = abuf_i2 = 0;
 
 
 
