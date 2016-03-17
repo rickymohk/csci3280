@@ -13,8 +13,8 @@ using System.Windows.Forms;
 using AForge.Video.FFMPEG;
 using Multimedia;
 using AviFile;
+using Accord.DirectSound;
 using WaveLib;
-
 
 namespace test1
 {
@@ -25,24 +25,22 @@ namespace test1
         int avi;       //pfile
 
         private bool hasAudio;
+        //        private AudioOutputDevice aPlayer;
         private WaveOutPlayer aPlayer;
-        private IntPtr astream;     //ppavi
+        private IntPtr astream,wavedata;     //ppavi
         private Avi.AVISTREAMINFO astreamInfo;
         private int sample_rate, sample_size, channels;
-        private int lstart,lend, astream_i;
+        private int lstart,len, astream_i;
 
         private VideoFileReader reader;
         private Bitmap[] vbuf;
         private int h, w, vbuf_i; 
         private long  frame_i,max_frame;
         private int fps, duration;
-
-
-
-
+        private long count,count2;
 
         private Byte[][] abuf;
-
+        //private float[][] abuf;
 
 
         private int abuf_size,abuf_i;
@@ -68,14 +66,18 @@ namespace test1
             reader = new VideoFileReader();
             vbuf = new Bitmap[2];
             abuf = new Byte[2][];
+            //abuf = new float[2][];
             t = new Multimedia.Timer();
             t.Tick += new System.EventHandler(this.nextFrame);
             t.SynchronizingObject = this;
             t.Mode = TimerMode.Periodic;
+            count = count2 = 0;
         }
 
         private void nextFrame(Object source, System.EventArgs e)
         {
+            toolStripStatusLabel1.Text = (count).ToString();
+            toolStripStatusLabel2.Text = (count).ToString();
             if (vbuf[vbuf_i] != null)
             {
 
@@ -122,40 +124,111 @@ namespace test1
 
         private void aStop()
         {
-            if(aPlayer != null)
-            try
+            if (aPlayer != null)
             {
+                try
+                {
                     aPlayer.Dispose();
-            }
-            finally
-            {
+                } 
+                finally
+                {
                     aPlayer = null;
+                }
             }
-        }
 
+        }
+       
         private void afiller(IntPtr data, int size)
         {
-            if(astream != null)
+            // toolStripStatusLabel1.Text = (count++).ToString();
+            count++;
+            if (abuf[abuf_i] != null)
             {
-                Avi.AVIStreamRead(astream, astream_i, size /(sample_size/8)/channels, data, size, 0, 0);
-                astream_i += size / (sample_size/8)/channels;
+                count2++;
+                Marshal.Copy(abuf[abuf_i], 0, data, size);
+              
+                if (astream != null && astream_i<lstart+len)
+                {
+                    Avi.AVIStreamRead(astream, astream_i, abuf_size / (sample_size / 8) / channels, wavedata, abuf_size, 0, 0);
+                    astream_i += abuf_size / (sample_size / 8) / channels;
+                    Marshal.Copy(wavedata, abuf[abuf_i], 0, abuf_size);
+                }
+                else
+                {
+                    /*
+                    for (int i = 0; i < abuf_size ; i++)
+                    {
+                        abuf[abuf_i][i] = 0;
+                    }
+                    */
+                    abuf[abuf_i] = null;
+                }
             }
             else
             {
-                for(int i=0;i<size;i++)
-                {
-                    Marshal.WriteByte(data, i, 0x00);
-                }
-
+                aStop();
             }
-        }
+            abuf_i = 1 - abuf_i;
 
+        }
+       
+        
+/*
+        private void afiller(object sender, Accord.Audio.NewFrameRequestedEventArgs arg )
+        {
+            arg.Frames = 8*abuf_size / sample_size / channels;
+            if (abuf[abuf_i]!=null)
+            {
+                int n = sample_size / 8;
+                if(n==0)
+                {
+                    n = 1;
+                }
+                for(int i=0;i< abuf_size-n;i+=n)
+                {
+                    float sample = 0;
+                    for (int j= i;j<i+ n;j++)
+                    {
+                        sample = sample*256;
+                        sample += abuf[abuf_i][j];
+                    }
+                    sample /= (float)Math.Pow(2, sample_size-1);
+                    arg.Buffer[i / n] = sample;
+                }
+               
+                if (astream != null)
+                {
+                    Avi.AVIStreamRead(astream, astream_i, 8 * abuf_size / sample_size / channels, wavedata, abuf_size, 0, 0);
+                    astream_i += 8* abuf_size / sample_size  / channels;
+                    Marshal.Copy(wavedata, abuf[abuf_i], 0, abuf_size);
+                }
+                else
+                {
+                    for (int i = 0; i < abuf_size / 4; i++)
+                    {
+                        abuf[abuf_i][i] = 0;
+                    }
+                }
+            }
+            else
+            {
+                aStop();
+            }
+            abuf_i = 1 - abuf_i;
+
+
+        }
+*/        
         private void aPlay()
         {
             aStop();
             if(astream != null)
             {
-                aPlayer = new WaveOutPlayer(-1,new WaveFormat(sample_rate,sample_size,channels),abuf_size,2,new BufferFillEventHandler(afiller));
+                
+               // aPlayer = new AudioOutputDevice(Handle, sample_rate, channels);
+               // aPlayer.NewFrameRequested += new EventHandler<Accord.Audio.NewFrameRequestedEventArgs>(afiller);
+               // aPlayer.Play();
+                 aPlayer = new WaveOutPlayer(-1,new WaveFormat(sample_rate,sample_size,channels),abuf_size,3,new BufferFillEventHandler(afiller));
             }
         }
 
@@ -225,36 +298,31 @@ namespace test1
                     sample_rate = pWave.nSamplesPerSec;
                     
                     sample_size = pWave.wBitsPerSample;
+                    toolStripStatusLabel1.Text = sample_size.ToString();
                     channels = pWave.nChannels;
                     lstart = Avi.AVIStreamStart(astream.ToInt32());
                     astream_i = lstart;
-                    lend = lstart + Avi.AVIStreamLength(astream.ToInt32());
+                    
+                    len = Avi.AVIStreamLength(astream.ToInt32())*sample_size;
                     abuf_size = channels * duration * sample_rate * sample_size / 8000;
-                    toolStripStatusLabel1.Text = sample_size.ToString();
-                    /*
-                                        float[] temp = new float[astreamLength / 4];
-                                        waveData = astream.GetStreamData(ref astreamInfo, ref astreamFormat, ref astreamLength);
-                                        Marshal.Copy(waveData, temp, astream_i, astreamLength/4-1);
-                    */
+                    
+                    /*              
+                                   abuf[0] = new Byte[abuf_size];
+                                   abuf[1] = new Byte[abuf_size];
+                       */
+                    abuf[0] = new Byte[abuf_size];
+                    abuf[1] = new Byte[abuf_size];
+                    if (wavedata != null) 
+                        Marshal.FreeHGlobal(wavedata);
+                    wavedata = Marshal.AllocHGlobal(abuf_size);
+                    Avi.AVIStreamRead(astream, astream_i, 8*abuf_size / sample_size / channels , wavedata, abuf_size, 0, 0);
+                    astream_i += 8*abuf_size / sample_size  / channels;
+                    Marshal.Copy(wavedata, abuf[0], 0, abuf_size);
+                    Avi.AVIStreamRead(astream, astream_i, 8*abuf_size / sample_size  / channels , wavedata, abuf_size, 0, 0);
+                    astream_i += 8*abuf_size / sample_size/ channels;
+                    Marshal.Copy(wavedata, abuf[1], 0, abuf_size);
+                    abuf_i = 0;
 
-                    /*
-                                        audio_out = new AudioOutputDevice(Handle, sample_rate, channels);
-                                        audio_out.Play(temp);
-
-                                        abuf_i = 0;
-                                        abuf[0] = new Byte[abuf_size];
-                                        abuf[1] = new Byte[abuf_size];
-                                        astreamInfo = new Avi.AVISTREAMINFO();
-                                        astreamFormat = new Avi.PCMWAVEFORMAT();
-                                        waveData = astream.GetStreamData(ref astreamInfo, ref astreamFormat, ref astreamLength);
-                                        Byte[] temp = new byte[astreamLength];
-                                        Marshal.Copy(waveData, temp, astream_i, astreamLength);
-                                        using (MemoryStream ms = new MemoryStream(temp))
-                                        {
-                                                SoundPlayer player = new SoundPlayer(audio_stream);
-                                                player.Play();
-                                        }
-                    */
 
 
                 }
@@ -269,8 +337,11 @@ namespace test1
             }
             if(hasAudio)
             {
-                Thread aThread = new Thread(new ThreadStart(aPlay));
-                aThread.Start();
+                aPlay();
+            }
+            else
+            {
+                aStop();
             }
 
 
@@ -307,6 +378,7 @@ namespace test1
                     loadPlayList(openFileDialog1.FileName);
                 }
             }
+            openFileDialog1.FileName = "";
         }
 
         private void button3_Click(object sender, EventArgs e)
