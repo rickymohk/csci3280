@@ -69,6 +69,9 @@
       <HintPath>..\..\AForge.NET Framework-2.2.5-(libs only)\Release\AForge.Video.FFMPEG.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="DirectShowLib-2005">
+      <HintPath>..\..\directshow\DirectShowLib-2005.dll</HintPath>
+    </Reference>
     <Reference Include="NAudio">
       <HintPath>..\..\NAudio-Release\NAudio.dll</HintPath>
     </Reference>
@@ -86,10 +89,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioStream.cs" />
+    <Compile Include="AVCodec.cs" />
+    <Compile Include="AVFormat.cs" />
     <Compile Include="Avi.cs" />
     <Compile Include="AviManager.cs" />
     <Compile Include="AviPlayer.cs" />
     <Compile Include="AviStream.cs" />
+    <Compile Include="AVUtil.cs" />
     <Compile Include="BadDeviceIdException.cs" />
     <Compile Include="DataReadyEventArgs.cs" />
     <Compile Include="EditableVideoStream.cs" />

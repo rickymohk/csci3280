@@ -13,7 +13,7 @@ using System.Windows.Forms;
 using AForge.Video.FFMPEG;
 using Multimedia;
 using AviFile;
-using Accord.DirectSound;
+using SharpFFmpeg;
 using WinMM;
 
 namespace test1
@@ -27,12 +27,14 @@ namespace test1
         private bool hasAudio;
         //        private AudioOutputDevice aPlayer;
         private WaveOut aPlayer;
+        Volume vol;
         private IntPtr astream,wavedata;     //ppavi
         private Avi.AVISTREAMINFO astreamInfo;
         private int sample_rate, sample_size, channels, lsamples;
         private WaveFormat wf;
         private int lstart,len, astream_i;
         private IntPtr temp1, temp2;
+        private int err;
 
         private VideoFileReader reader;
         private Bitmap[] vbuf;
@@ -40,8 +42,23 @@ namespace test1
         private long  frame_i,max_frame;
         private int fps, duration;
         private long count,count2;
-
+        /*
+        private IntPtr pFormatCtx;
+        private FFmpeg.AVFormatContext FormatCtx;
+        private IntPtr pAudioCodecCtx;
+        private FFmpeg.AVCodecContext AudioCodecCtx;
+        private IntPtr pAudioCodec;
+        private IntPtr pSamples;
+        private int frame_size_ptr;
+        */
         private Byte[][] abuf;
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            vol.Left = (float)trackBar1.Value / 100;
+            vol.Right = (float)trackBar1.Value / 100;
+        }
+
         //private float[][] abuf;
 
 
@@ -63,6 +80,7 @@ namespace test1
         {
             InitializeComponent();
             Avi.AVIFileInit();
+         //   FFmpeg.av_register_all();
             avi = 0;
             hasAudio = false;
             reader = new VideoFileReader();
@@ -75,13 +93,14 @@ namespace test1
             t.Mode = TimerMode.Periodic;
             temp1 = Marshal.AllocHGlobal(4);
             temp2 = Marshal.AllocHGlobal(4);
+            vol = new Volume((float)0.5);
+            trackBar1.Value = 50;
             count = count2 = 0;
+
         }
 
         private void nextFrame(Object source, System.EventArgs e)
         {
-            toolStripStatusLabel1.Text = astream_i.ToString();
-            toolStripStatusLabel2.Text = (lstart + len).ToString();
             if (vbuf[vbuf_i] != null)
             {
 
@@ -99,7 +118,7 @@ namespace test1
             }              
             else
             {
-                t.Dispose();
+                t.Stop();
             }
             /*
                         if(abuf[abuf_i] != null)
@@ -123,6 +142,9 @@ namespace test1
                         }
             */
 
+            toolStripStatusLabel1.Text = aPlayer.Volume.Left.ToString();
+            toolStripStatusLabel2.Text = aPlayer.Volume.Right.ToString();
+            aPlayer.Volume = vol;
             if (abuf[abuf_i] != null)
             //     if(true)
             {
@@ -132,7 +154,8 @@ namespace test1
                 if (astream != null && astream_i < lstart + len)
                 {
                     count++;
-                    Avi.AVIStreamRead(astream, astream_i, lsamples, wavedata, abuf_size, temp1.ToInt32(), temp2.ToInt32());
+                    err = Avi.AVIStreamRead(astream, astream_i, lsamples, wavedata, abuf_size, temp1.ToInt32(), temp2.ToInt32());
+               //     err = FFmpeg.avcodec_decode_audio(pAudioCodecCtx, pSamples, out frame_size_ptr, wavedata, abuf_size);
                     astream_i += lsamples;
                     Marshal.Copy(wavedata, abuf[abuf_i], 0, abuf_size);
                 }
@@ -233,11 +256,120 @@ namespace test1
                 wf.FormatTag = WaveFormatTag.Pcm;
                 wf.SamplesPerSecond = sample_rate;
                 aPlayer.Open(wf);
+                
+
             }
         }
 
         private void play(String filepath)
         {
+ /*
+            if (avi == 0)
+            {
+                
+                if (FFmpeg.av_open_input_file(out pFormatCtx, filepath, IntPtr.Zero, 0, IntPtr.Zero) < 0)
+                {
+                    MessageBox.Show("Cannot open file");
+                }
+                else if ( FFmpeg.av_find_stream_info(pFormatCtx) < 0)
+                {
+                    MessageBox.Show("Cannot find stream info");
+                }
+                else
+                {
+                    avi = 1;
+                    FormatCtx = new FFmpeg.AVFormatContext();
+
+                    FormatCtx = (FFmpeg.AVFormatContext)Marshal.PtrToStructure(pFormatCtx, typeof(FFmpeg.AVFormatContext));
+                    int audioStream = -1;
+                    hasAudio = false;
+                    for (int i = 0; i < FormatCtx.nb_streams; i++)
+                    {
+                        FFmpeg.AVStream stream = (FFmpeg.AVStream)Marshal.PtrToStructure(FormatCtx.streams[i], typeof(FFmpeg.AVStream));
+                        FFmpeg.AVCodecContext codec = (FFmpeg.AVCodecContext)Marshal.PtrToStructure(stream.codec, typeof(FFmpeg.AVCodecContext));
+                        if (codec.codec_type == FFmpeg.CodecType.CODEC_TYPE_AUDIO && audioStream == -1)
+                        {
+                            audioStream = i;
+                            hasAudio = true;
+                            pAudioCodecCtx = stream.codec;
+                            AudioCodecCtx = codec;
+                            pAudioCodec = FFmpeg.avcodec_find_decoder(AudioCodecCtx.codec_id);
+                            if (pAudioCodec == IntPtr.Zero)
+                            {
+                                MessageBox.Show("Connot find audio decoder");
+                            }
+                            else
+                            {
+                                FFmpeg.avcodec_open(stream.codec, pAudioCodec);
+                                sample_rate = AudioCodecCtx.sample_rate;
+                                channels = AudioCodecCtx.channels;
+                                sample_size = AudioCodecCtx.bits_per_sample;
+                                abuf_size = channels * duration * sample_rate * sample_size / 8000;
+                                lsamples = 8 * abuf_size / sample_size / channels;
+                                pSamples = Marshal.AllocHGlobal(4);
+                                Marshal.WriteInt32(pSamples, lsamples);
+                                abuf[0] = new Byte[abuf_size];
+                                abuf[1] = new Byte[abuf_size];
+                                if (wavedata != null)
+                                    Marshal.FreeHGlobal(wavedata);
+                                wavedata = Marshal.AllocHGlobal(abuf_size);
+                                frame_size_ptr = abuf_size;
+                                FFmpeg.avcodec_decode_audio(pAudioCodecCtx, pSamples, out frame_size_ptr, wavedata, abuf_size);
+                                Marshal.Copy(wavedata, abuf[0], 0, abuf_size);
+                                FFmpeg.avcodec_decode_audio(pAudioCodecCtx, pSamples, out frame_size_ptr, wavedata, abuf_size);
+                                Marshal.Copy(wavedata, abuf[1], 0, abuf_size);
+                                abuf_i = 0;
+                            }
+                        }
+                    }
+                    try
+                    {
+                        reader.Close();
+                        reader.Open(avi_path);
+                        if (reader.IsOpen)
+                        {
+                            max_frame = reader.FrameCount;
+                            frame_i = 0;
+                            vbuf_i = 0;
+                            vbuf[0] = reader.ReadVideoFrame();
+                            vbuf[1] = reader.ReadVideoFrame();
+                            fps = reader.FrameRate;
+                            duration = 1000 / fps;
+                            t.Period = duration;
+                            t.Start();
+
+                        }
+                        else
+                        {
+                            MessageBox.Show("Cannot open Video file2");
+                        }
+                    }
+                    catch (System.IO.IOException e)
+                    {
+                        if (e.Data.Equals("Cannot open Video file"))
+                        {
+                            MessageBox.Show("Cannot open Video file1");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                t.Start();
+            }
+            if (hasAudio)
+            {
+                Thread aThread = new Thread(new ThreadStart(aPlay));
+                aThread.Start();
+            }
+            else
+            {
+                aStop();
+            }
+        
+  */          
+
+
             if(avi==0)
             {
                 Avi.AVIFILEINFO aviHeader = new Avi.AVIFILEINFO();
@@ -310,10 +442,8 @@ namespace test1
                     len = Avi.AVIStreamLength(astream.ToInt32())*sample_size;
                     abuf_size = channels * duration * sample_rate * sample_size / 8000;
                     lsamples = 8 * abuf_size / sample_size / channels;
-                    /*              
-                                   abuf[0] = new Byte[abuf_size];
-                                   abuf[1] = new Byte[abuf_size];
-                       */
+
+                       
                     abuf[0] = new Byte[abuf_size];
                     abuf[1] = new Byte[abuf_size];
                     if (wavedata != null) 
@@ -325,7 +455,7 @@ namespace test1
                     Avi.AVIStreamRead(astream, astream_i, lsamples, wavedata, abuf_size, 0, 0);
                     astream_i += lsamples;
                     Marshal.Copy(wavedata, abuf[1], 0, abuf_size);
-                    abuf_i = abuf_i2 = 0;
+                    abuf_i = 0;
 
 
 
