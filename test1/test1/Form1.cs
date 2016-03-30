@@ -10,19 +10,23 @@ using System.Text;
 using System.Threading;
 using System.IO;
 using System.Windows.Forms;
+using System.Net;
+using System.Net.Sockets;
 using AForge.Video.FFMPEG;
 using Multimedia;
 using AviFile;
-using SharpFFmpeg;
+//using SharpFFmpeg;
 using WinMM;
 
 namespace test1
 {
     public partial class Form1 : Form
     {
+        
         private Multimedia.Timer t;
         private String avi_path;
-        int avi;       //pfile
+        private int avi;       //pfile
+        
 
         private bool hasAudio;
         //        private AudioOutputDevice aPlayer;
@@ -53,11 +57,25 @@ namespace test1
         */
         private Byte[][] abuf;
 
+
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
             vol.Left = (float)trackBar1.Value / 100;
             vol.Right = (float)trackBar1.Value / 100;
         }
+
+        private void listView1_MouseClick(object sender, MouseEventArgs e)
+        {
+            String file = listView1.SelectedItems[0].SubItems[3].Text;
+            toolStripStatusLabel1.Text = file;
+            if (avi_path != file)
+            {
+                avi_path = file;
+                avi = 0;
+            }
+        }
+
+
 
         //private float[][] abuf;
 
@@ -96,6 +114,9 @@ namespace test1
             vol = new Volume((float)0.5);
             trackBar1.Value = 50;
             count = count2 = 0;
+            port = 7689;
+            max_peer = 2;
+            outpacket = null;
 
         }
 
@@ -118,6 +139,9 @@ namespace test1
             }              
             else
             {
+                pictureBox1.Image = null;
+                aStop();
+                button1.Text = "Play";
                 t.Stop();
             }
             /*
@@ -142,12 +166,14 @@ namespace test1
                         }
             */
 
-            toolStripStatusLabel1.Text = aPlayer.Volume.Left.ToString();
-            toolStripStatusLabel2.Text = aPlayer.Volume.Right.ToString();
-            aPlayer.Volume = vol;
-            if (abuf[abuf_i] != null)
+
+         
+            if (hasAudio && abuf[abuf_i] != null)
             //     if(true)
             {
+                aPlayer.Volume = vol;
+                toolStripStatusLabel1.Text = aPlayer.Volume.Left.ToString();
+                toolStripStatusLabel2.Text = aPlayer.Volume.Right.ToString();
                 count2++;
                 //        Marshal.Copy(abuf[abuf_i], 0, data, size);
                 aPlayer.Write(abuf[abuf_i]);
@@ -156,8 +182,16 @@ namespace test1
                     count++;
                     err = Avi.AVIStreamRead(astream, astream_i, lsamples, wavedata, abuf_size, temp1.ToInt32(), temp2.ToInt32());
                //     err = FFmpeg.avcodec_decode_audio(pAudioCodecCtx, pSamples, out frame_size_ptr, wavedata, abuf_size);
-                    astream_i += lsamples;
-                    Marshal.Copy(wavedata, abuf[abuf_i], 0, abuf_size);
+                    if(err==0)
+                    {
+                        astream_i += lsamples;
+                        Marshal.Copy(wavedata, abuf[abuf_i], 0, abuf_size);
+                    }
+                    else
+                    {
+                        abuf[abuf_i] = null;
+                    }
+                    
                 }
                 else
                 {
@@ -249,19 +283,27 @@ namespace test1
                 // aPlayer = new AudioOutputDevice(Handle, sample_rate, channels);
                 // aPlayer.NewFrameRequested += new EventHandler<Accord.Audio.NewFrameRequestedEventArgs>(afiller);
                 // aPlayer.Play();
-                aPlayer = new WaveOut(-1);
-                wf = new WaveFormat();
-                wf.Channels = (short)channels;
-                wf.BitsPerSample = (short)sample_size;
-                wf.FormatTag = WaveFormatTag.Pcm;
-                wf.SamplesPerSecond = sample_rate;
-                aPlayer.Open(wf);
-                
+                try
+                {
+                    aPlayer = new WaveOut(-1);
+                    wf = new WaveFormat();
+                    wf.Channels = (short)channels;
+                    wf.BitsPerSample = (short)sample_size;
+                    wf.FormatTag = WaveFormatTag.Pcm;
+                    wf.SamplesPerSecond = sample_rate;
+                    aPlayer.Open(wf);
+                }
+                catch(MMSystemException e)
+                {
+                    hasAudio = false;
+                    MessageBox.Show("Cannot play audio.");
+                    
+                }
 
             }
         }
 
-        private void play(String filepath)
+        private int play(String filepath)
         {
  /*
             if (avi == 0)
@@ -390,7 +432,8 @@ namespace test1
                     }
                     else
                     {
-                        MessageBox.Show("Cannot open Video file3");
+                        MessageBox.Show("Cannot open Video file");
+                        return -1;
                     }
 
                 }
@@ -413,15 +456,17 @@ namespace test1
                     }
                     else
                     {
-                        MessageBox.Show("Cannot open Video file2");
+                        MessageBox.Show("Cannot open Video file");
+                        return -1;
                     }
                 }
                 catch (System.IO.IOException e)
                 {
                     if (e.Data.Equals("Cannot open Video file"))
                     {
-                        MessageBox.Show("Cannot open Video file1");
+                        MessageBox.Show("Cannot open Video file");
                     }
+                    return -1;
                 }
                 if (hasAudio)
                 { 
@@ -456,9 +501,6 @@ namespace test1
                     astream_i += lsamples;
                     Marshal.Copy(wavedata, abuf[1], 0, abuf_size);
                     abuf_i = 0;
-
-
-
                 }
                 
 
@@ -477,7 +519,7 @@ namespace test1
             {
                 aStop();
             }
-
+            return 0;
 
         }
 
@@ -488,14 +530,23 @@ namespace test1
 
         private void button1_Click(object sender, EventArgs e)  
         {
-            play(avi_path);
+            if(button1.Text=="Play")
+            {
+                if(play(avi_path)==0)
+                {
+                    button1.Text = "Pause";
+                }
+                
+            }
+            else if(button1.Text=="Pause")
+            {
+                t.Stop();
+                aStop();
+                button1.Text = "Play";
+            }
+           
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            t.Stop();
-            aStop();
-        }
 
         private void openFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -504,8 +555,13 @@ namespace test1
             {
                 if(openFileDialog1.FilterIndex==1) /*avi*/
                 {
-                    avi_path = openFileDialog1.FileName;
-                    avi = 0;
+                    if(avi_path != openFileDialog1.FileName)
+                    {
+                        avi_path = openFileDialog1.FileName;
+                        avi = 0;
+                        listView1.Refresh();
+                    }
+
                 }
                 else if(openFileDialog1.FilterIndex==2)            /*txt*/
                 {
@@ -549,6 +605,99 @@ namespace test1
                 
             }
 
+        }
+
+        public string[] peerIP;
+        private int port,max_peer,peer_no;
+        public char[] outpacket;
+
+        private void p2PConnectionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form2 connectForm = new Form2() { Owner = this };
+            connectForm.StartPosition = FormStartPosition.Manual;
+            connectForm.Show(this);
+        }
+
+        public void setPeerIP(string[] ipaddr)
+        {
+            peerIP = ipaddr;
+            toolStripStatusLabel1.Text = peerIP[0];
+            toolStripStatusLabel2.Text = peerIP[1];
+            peer_no = 2;
+        }
+
+        public void serverMain()
+        {
+            IPEndPoint ipep = new IPEndPoint(IPAddress.Any, port);
+            Socket newsock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            newsock.Bind(ipep);
+            newsock.Listen(10);
+            Socket[] client = new Socket[peer_no];
+            for(int i=0;i<peer_no;i++)
+            {
+                client[i] = newsock.Accept();
+                new TcpListener(client[i],this);
+            }
+            newsock.Close();
+
+        }
+
+        public void ClientMain(String ip)
+        {
+            IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(ip), port);
+            Socket server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            server.Connect(ipep);
+            new TcpListener(server,this);
+            server.Shutdown(SocketShutdown.Both);
+            server.Close();
+        }
+    }
+    
+    public class TcpListener
+    {
+        Socket socket;
+        Thread inThread, outThread;
+        NetworkStream stream;
+        StreamReader reader;
+        StreamWriter writer;
+        Form1 parent;
+        int bufsize;
+
+        public TcpListener (Socket s,Form1 f)
+        {
+            bufsize = 8192;
+            socket = s;
+            stream = new NetworkStream(s);
+            reader = new StreamReader(stream);
+            writer = new StreamWriter(stream);
+            inThread = new Thread(new ThreadStart(inLoop));
+            inThread.Start();
+            outThread = new Thread(new ThreadStart(outLoop));
+            outThread.Start();
+            inThread.Join();
+            parent = f;
+        }
+
+        public void inLoop()
+        {
+            while(true)
+            {
+                char[] packet = new char[bufsize];
+                reader.ReadBlock(packet, 0, bufsize);
+            }
+        }
+
+        public void outLoop()
+        {
+            while(true)
+            {
+                char[] packet = new char[bufsize];
+                if(parent.outpacket!=null)
+                {
+                    writer.Write(packet, 0, bufsize);
+                    writer.Flush();
+                }
+            }
         }
     }
 }
