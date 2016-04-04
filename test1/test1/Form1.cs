@@ -56,6 +56,7 @@ namespace test1
         private int frame_size_ptr;
         */
         private Byte[][] abuf;
+        private string songList_path = @"./songList.txt";
 
 
         private void trackBar1_Scroll(object sender, EventArgs e)
@@ -64,16 +65,16 @@ namespace test1
             vol.Right = (float)trackBar1.Value / 100;
         }
 
-        private void listView1_MouseClick(object sender, MouseEventArgs e)
+  /*      private void listView1_MouseClick(object sender, MouseEventArgs e)
         {
-            String file = listView1.SelectedItems[0].SubItems[3].Text;
+            String file = songList.SelectedItems[0].SubItems[3].Text;
             toolStripStatusLabel1.Text = file;
             if (avi_path != file)
             {
                 avi_path = file;
                 avi = 0;
             }
-        }
+        } */
 
 
 
@@ -84,14 +85,14 @@ namespace test1
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            String file = listView1.SelectedItems[0].SubItems[3].Text;
-            toolStripStatusLabel1.Text = file;
-            if(avi_path != file)
-            {
-                avi_path = file;
-                avi = 0;
-            }
-            
+            /*          String file = listView1.SelectedItems[0].SubItems[3].Text;
+                      toolStripStatusLabel1.Text = file;
+                      if(avi_path != file)
+                      {
+                          avi_path = file;
+                          avi = 0;
+                      }
+                     */
         }
 
         public Form1()
@@ -226,54 +227,74 @@ namespace test1
             }
             
         }
-       
-        
-/*
-        private void afiller(object sender, Accord.Audio.NewFrameRequestedEventArgs arg )
-        {
-            arg.Frames = 8*abuf_size / sample_size / channels;
-            if (abuf[abuf_i]!=null)
-            {
-                int n = sample_size / 8;
-                if(n==0)
-                {
-                    n = 1;
-                }
-                for(int i=0;i< abuf_size-n;i+=n)
-                {
-                    float sample = 0;
-                    for (int j= i;j<i+ n;j++)
-                    {
-                        sample = sample*256;
-                        sample += abuf[abuf_i][j];
-                    }
-                    sample /= (float)Math.Pow(2, sample_size-1);
-                    arg.Buffer[i / n] = sample;
-                }
-               
-                if (astream != null)
-                {
-                    Avi.AVIStreamRead(astream, astream_i, 8 * abuf_size / sample_size / channels, wavedata, abuf_size, 0, 0);
-                    astream_i += 8* abuf_size / sample_size  / channels;
-                    Marshal.Copy(wavedata, abuf[abuf_i], 0, abuf_size);
-                }
-                else
-                {
-                    for (int i = 0; i < abuf_size / 4; i++)
-                    {
-                        abuf[abuf_i][i] = 0;
-                    }
-                }
-            }
-            else
-            {
-                aStop();
-            }
-            abuf_i = 1 - abuf_i;
 
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
 
         }
-*/        
+
+        private void filesFToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void songList_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void songList_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+
+        /*
+                private void afiller(object sender, Accord.Audio.NewFrameRequestedEventArgs arg )
+                {
+                    arg.Frames = 8*abuf_size / sample_size / channels;
+                    if (abuf[abuf_i]!=null)
+                    {
+                        int n = sample_size / 8;
+                        if(n==0)
+                        {
+                            n = 1;
+                        }
+                        for(int i=0;i< abuf_size-n;i+=n)
+                        {
+                            float sample = 0;
+                            for (int j= i;j<i+ n;j++)
+                            {
+                                sample = sample*256;
+                                sample += abuf[abuf_i][j];
+                            }
+                            sample /= (float)Math.Pow(2, sample_size-1);
+                            arg.Buffer[i / n] = sample;
+                        }
+
+                        if (astream != null)
+                        {
+                            Avi.AVIStreamRead(astream, astream_i, 8 * abuf_size / sample_size / channels, wavedata, abuf_size, 0, 0);
+                            astream_i += 8* abuf_size / sample_size  / channels;
+                            Marshal.Copy(wavedata, abuf[abuf_i], 0, abuf_size);
+                        }
+                        else
+                        {
+                            for (int i = 0; i < abuf_size / 4; i++)
+                            {
+                                abuf[abuf_i][i] = 0;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        aStop();
+                    }
+                    abuf_i = 1 - abuf_i;
+
+
+                }
+        */
         private void aPlay()
         {
             aStop();
@@ -302,6 +323,8 @@ namespace test1
 
             }
         }
+
+
 
         private int play(String filepath)
         {
@@ -559,7 +582,25 @@ namespace test1
                     {
                         avi_path = openFileDialog1.FileName;
                         avi = 0;
-                        listView1.Refresh();
+                        popupForm popup = new popupForm();
+                        DialogResult dialogresult = popup.ShowDialog();
+                        if (dialogresult == DialogResult.OK)
+                        {
+                            string title = popup.title;
+                            string singer = popup.singer;
+                            string album = popup.album;
+                            DataGridViewRow row = (DataGridViewRow)songList.Rows[0].Clone();
+                            row.Cells[0].Value = title;
+                            row.Cells[1].Value = singer;
+                            row.Cells[2].Value = album;
+                            songList.Rows.Add(row);
+                        }
+                        popup.Dispose();
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(songList_path, true))
+                        {
+                            file.WriteLine("\"" + popup.title + "\" \"" + popup.singer + "\" \"" + popup.album + "\"");
+                        }
+
                     }
 
                 }
@@ -570,6 +611,7 @@ namespace test1
             }
             openFileDialog1.FileName = "";
         }
+
 
         private void button3_Click(object sender, EventArgs e)
         {
@@ -606,6 +648,7 @@ namespace test1
             }
 
         }
+
 
         public string[] peerIP;
         private int port,max_peer,peer_no;
