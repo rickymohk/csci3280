@@ -155,6 +155,7 @@
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
             this.flowLayoutPanel2.Size = new System.Drawing.Size(653, 22);
             this.flowLayoutPanel2.TabIndex = 13;
+
             // 
             // menuStrip2
             // 
@@ -183,6 +184,9 @@
             this.p2PConnectionToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.p2PConnectionToolStripMenuItem.Text = "P2P connection";
             this.p2PConnectionToolStripMenuItem.Click += new System.EventHandler(this.p2PConnectionToolStripMenuItem_Click);
+
+
+
             // 
             // testToolStripMenuItem
             // 
