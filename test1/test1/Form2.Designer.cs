@@ -30,13 +30,13 @@
         {
             this.fontDialog1 = new System.Windows.Forms.FontDialog();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.ip2 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.buttonConnect = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
+            this.ip2 = new System.Windows.Forms.Label();
             this.ip1 = new System.Windows.Forms.Label();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.TextBoxLocalIP = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
@@ -66,32 +66,6 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(282, 128);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
-            // ip2
-            // 
-            this.ip2.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.ip2.AutoSize = true;
-            this.ip2.Location = new System.Drawing.Point(4, 68);
-            this.ip2.Name = "ip2";
-            this.ip2.Size = new System.Drawing.Size(104, 13);
-            this.ip2.TabIndex = 1;
-            this.ip2.Text = "Peer 2\'s IP address :";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.textBox1.Location = new System.Drawing.Point(119, 35);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(155, 20);
-            this.textBox1.TabIndex = 2;
-            // 
-            // textBox2
-            // 
-            this.textBox2.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.textBox2.Location = new System.Drawing.Point(119, 65);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(155, 20);
-            this.textBox2.TabIndex = 3;
-            // 
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.ColumnCount = 2;
@@ -107,6 +81,7 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(276, 32);
             this.tableLayoutPanel2.TabIndex = 4;
+            this.tableLayoutPanel2.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel2_Paint);
             // 
             // buttonConnect
             // 
@@ -131,6 +106,16 @@
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
+            // ip2
+            // 
+            this.ip2.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.ip2.AutoSize = true;
+            this.ip2.Location = new System.Drawing.Point(4, 68);
+            this.ip2.Name = "ip2";
+            this.ip2.Size = new System.Drawing.Size(104, 13);
+            this.ip2.TabIndex = 2;
+            this.ip2.Text = "Peer 2\'s IP address :";
+            // 
             // ip1
             // 
             this.ip1.Anchor = System.Windows.Forms.AnchorStyles.Right;
@@ -138,8 +123,24 @@
             this.ip1.Location = new System.Drawing.Point(7, 38);
             this.ip1.Name = "ip1";
             this.ip1.Size = new System.Drawing.Size(101, 13);
-            this.ip1.TabIndex = 0;
+            this.ip1.TabIndex = 1;
             this.ip1.Text = "Peer 1\'s IP address:";
+            // 
+            // textBox2
+            // 
+            this.textBox2.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.textBox2.Location = new System.Drawing.Point(119, 65);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(155, 20);
+            this.textBox2.TabIndex = 5;
+            // 
+            // textBox1
+            // 
+            this.textBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.textBox1.Location = new System.Drawing.Point(119, 35);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(155, 20);
+            this.textBox1.TabIndex = 4;
             // 
             // label1
             // 
@@ -148,7 +149,7 @@
             this.label1.Location = new System.Drawing.Point(12, 8);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(86, 13);
-            this.label1.TabIndex = 5;
+            this.label1.TabIndex = 0;
             this.label1.Text = "Local IP address";
             // 
             // TextBoxLocalIP
@@ -157,7 +158,7 @@
             this.TextBoxLocalIP.Location = new System.Drawing.Point(119, 5);
             this.TextBoxLocalIP.Name = "TextBoxLocalIP";
             this.TextBoxLocalIP.Size = new System.Drawing.Size(155, 20);
-            this.TextBoxLocalIP.TabIndex = 6;
+            this.TextBoxLocalIP.TabIndex = 3;
             // 
             // Form2
             // 

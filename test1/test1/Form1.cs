@@ -124,6 +124,7 @@ namespace test1
             done = false;
             packet_size = 8192;
             testppm = null;
+            uc = null;
         }
 
         private void nextFrame(Object source, System.EventArgs e)
@@ -872,6 +873,7 @@ namespace test1
             peerIP = ipaddr;
             toolStripStatusLabel1.Text = peerIP[0];
             toolStripStatusLabel2.Text = peerIP[1];
+            peer_no = 0;
             if(peerIP[0]!="")
             {
                 peer_no++;
@@ -884,9 +886,19 @@ namespace test1
             //            serverThread.IsBackground = true;
             //            serverThread.Start();
             IPEndPoint ipep = new IPEndPoint(IPAddress.Any, port);
-            uc = new UdpClient(ipep.Port);
-            backgroundWorker1.WorkerReportsProgress = true;
-            backgroundWorker1.RunWorkerAsync();
+
+            if(peer_no>0)
+            {
+                if (uc != null)
+                {
+                    uc.Close();
+                }
+                uc = new UdpClient(ipep.Port);
+                backgroundWorker1.WorkerReportsProgress = true;
+                backgroundWorker1.RunWorkerAsync();
+            }
+            
+
             
 
         }
