@@ -35,6 +35,7 @@ namespace test1
         private void buttonConnect_Click(object sender, EventArgs e)
         {
             string[] ip = new string[2];
+            string localIP = TextBoxLocalIP.Text;
             ip[0] = textBox1.Text;
             ip[1] = textBox2.Text;
             string[] separators = new string[] { "." };
@@ -44,11 +45,13 @@ namespace test1
             ipaddr[1] = ip[1].Split(separators, StringSplitOptions.None);
             for(int i=0;i<ipaddr.Length;i++)
             {
-                valid = valid && checkIP(ipaddr[i]);
+                valid = valid && (checkIP(ipaddr[i])||ip[i]=="");
             }
+            string[] localaddr = localIP.Split(separators, StringSplitOptions.None);
+            valid = valid && (checkIP(localaddr)||localIP=="");
             if(valid)
             {
-                parent.setPeerIP(ip);
+                parent.setPeerIP(localIP,ip);
                 this.Close();
             }
             else
