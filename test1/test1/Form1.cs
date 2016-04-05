@@ -35,6 +35,7 @@ namespace test1
         private IntPtr astream, wavedata;     //ppavi
         private Avi.AVISTREAMINFO astreamInfo;
         private int sample_rate, sample_size, channels, lsamples;
+        private short format_tag;
         private WaveFormat wf;
         private int lstart, len, astream_i;
         private IntPtr temp1, temp2;
@@ -314,7 +315,8 @@ namespace test1
                     wf = new WaveFormat();
                     wf.Channels = (short)channels;
                     wf.BitsPerSample = (short)sample_size;
-                    wf.FormatTag = WaveFormatTag.Pcm;
+                    wf.FormatTag = (WaveFormatTag)format_tag;
+                    
                     wf.SamplesPerSecond = sample_rate;
                     aPlayer.Open(wf);
                 }
@@ -503,6 +505,9 @@ namespace test1
                     Avi.AVIStreamReadFormat(astream, 0, 0, ref lsize);
                     Avi.PCMWAVEFORMAT pWave = new Avi.PCMWAVEFORMAT();
                     Avi.AVIStreamReadFormat(astream, 0, ref pWave, ref lsize);
+
+                    format_tag =  pWave.wFormatTag;
+                    
                     sample_rate = pWave.nSamplesPerSec;
 
                     sample_size = pWave.wBitsPerSample;
