@@ -707,82 +707,90 @@ namespace test1
 
         private void sendTest(IPEndPoint ipep, int i)
         {
-            FileStream fs = File.OpenRead("1.ppm");
-            packet p = new packet();
-            p.code = (byte)packetCode.TestFilePart;
-            p.senderIP = localIP==""?0:BitConverter.ToInt32(IPAddress.Parse(localIP).GetAddressBytes(), 0);
-            p.frameNo = 0;
-            p.total = (int)(fs.Length /packet_size);
-            if((fs.Length % packet_size)!=0)
+            using (FileStream fs = File.OpenRead("1.ppm"))
             {
-                p.total++;
-            }
-            int j = 0;
-            bool flag = true;
-            while(flag)
-            {
-                if(j%peer_no==i)
+                packet p = new packet();
+                p.code = (byte)packetCode.TestFilePart;
+                p.senderIP = localIP==""?0:BitConverter.ToInt32(IPAddress.Parse(localIP).GetAddressBytes(), 0);
+                p.frameNo = 0;
+                p.total = (int)(fs.Length /packet_size);
+                if((fs.Length % packet_size)!=0)
                 {
-                    long remain = (fs.Length - fs.Position);
-
-                    p.data = new byte[packet_size];
-                    int c = fs.Read(p.data, 0, packet_size);
-                    if(c<packet_size)
-                    {
-                        flag = false;
-                    }
-                    if(c>0)
-                    {
-                        p.size = packet_size;
-                        p.order = j;
-                        byte[] b = packet2array(p);
-                        uc.Send(b, b.Length, ipep);
-                    }
-
+                    p.total++;
                 }
-                else
+                int j = 0;
+                bool flag = true;
+                while(flag)
                 {
-                    fs.Seek(packet_size, SeekOrigin.Current);    
+                    if(j%peer_no==i)
+                    {
+                        long remain = (fs.Length - fs.Position);
+
+                        p.data = new byte[packet_size];
+                        int c = fs.Read(p.data, 0, packet_size);
+                        if(c<packet_size)
+                        {
+                            flag = false;
+                        }
+                        if(c>0)
+                        {
+                            p.size = packet_size;
+                            p.order = j;
+                            byte[] b = packet2array(p);
+                            uc.Send(b, b.Length, ipep);
+                        }
+
+                    }
+                    else
+                    {
+                        fs.Seek(packet_size, SeekOrigin.Current);    
+                    }
+                    j++;
                 }
-                j++;
             }
+            
             
         }
 
         private byte[] packet2array(packet p)
         {
             byte[] b;
-            MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
-            bw.Write(p.code);
-            bw.Write(p.senderIP);
-            bw.Write(p.frameNo);
-            bw.Write(p.order);
-            bw.Write(p.total);
-            bw.Write(p.size);
-            bw.Write(p.data);
-            b = ms.ToArray();
-            bw.Close();
-            ms.Close();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (BinaryWriter bw = new BinaryWriter(ms))
+                {
+                    bw.Write(p.code);
+                    bw.Write(p.senderIP);
+                    bw.Write(p.frameNo);
+                    bw.Write(p.order);
+                    bw.Write(p.total);
+                    bw.Write(p.size);
+                    bw.Write(p.data);
+                    b = ms.ToArray();
+                }
+            }
             return b;
         }
 
         private packet array2packet(byte[] b)
         {
-            MemoryStream ms = new MemoryStream(b);
-            BinaryReader br = new BinaryReader(ms);
             packet p = new packet();
-            p.code = br.ReadByte();
-            p.senderIP = br.ReadInt32();
-            p.frameNo = br.ReadInt32();
-            p.order = br.ReadInt32();
-            p.total = br.ReadInt32();
-            p.size = br.ReadInt32();
-            p.data = br.ReadBytes(p.size);
-            br.Close();
-            ms.Close();
+            using (MemoryStream ms = new MemoryStream(b))
+            {
+                using (BinaryReader br = new BinaryReader(ms))
+                {
+                    
+                    p.code = br.ReadByte();
+                    p.senderIP = br.ReadInt32();
+                    p.frameNo = br.ReadInt32();
+                    p.order = br.ReadInt32();
+                    p.total = br.ReadInt32();
+                    p.size = br.ReadInt32();
+                    p.data = br.ReadBytes(p.size);
+                    
+                }
+            }
             return p;
-
         }
 
 
@@ -962,46 +970,44 @@ namespace test1
             
             if ((string)e.UserState == "Display test ppm")
             {
-                MemoryStream ms = new MemoryStream(testppm);
-                StreamReader sr = new StreamReader(ms);
-                BinaryReader br = new BinaryReader(ms);
-                short magic = br.ReadInt16();
-                ms.Seek(1, SeekOrigin.Current);
-                int width = int.Parse(Encoding.ASCII.GetString(br.ReadBytes(3)));
-                ms.Seek(1, SeekOrigin.Current);
-                int height = int.Parse(Encoding.ASCII.GetString(br.ReadBytes(3)));
-                ms.Seek(1, SeekOrigin.Current);
-                int max = int.Parse(Encoding.ASCII.GetString(br.ReadBytes(3)));
-                ms.Seek(1, SeekOrigin.Current);
-                Bitmap bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);           
-                for (int i = 0; i < height; i++)
+                using (MemoryStream ms = new MemoryStream(testppm))
                 {
-                    for (int j = 0; j < width; j++)
+                    using (BinaryReader br = new BinaryReader(ms))
                     {
-                       
-                        
-                        try
+                        short magic = br.ReadInt16();
+                        ms.Seek(1, SeekOrigin.Current);
+                        int width = int.Parse(Encoding.ASCII.GetString(br.ReadBytes(3)));
+                        ms.Seek(1, SeekOrigin.Current);
+                        int height = int.Parse(Encoding.ASCII.GetString(br.ReadBytes(3)));
+                        ms.Seek(1, SeekOrigin.Current);
+                        int max = int.Parse(Encoding.ASCII.GetString(br.ReadBytes(3)));
+                        ms.Seek(1, SeekOrigin.Current);
+                        Bitmap bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);           
+                        for (int i = 0; i < height; i++)
                         {
-                            int r, g, b;
-                            r = br.ReadByte();                        
-                            g = br.ReadByte();
-                            b = br.ReadByte();
-                            bmp.SetPixel(j, i, Color.FromArgb(255, r, g, b));
-                        }
-                        catch(System.Exception ex)
-                        {
-                            textBox1.Text = i.ToString() + j.ToString();
-                        }
-
-                        
-                        
+                            for (int j = 0; j < width; j++)
+                            {
+                                try
+                                {
+                                    int r, g, b;
+                                    r = br.ReadByte();                        
+                                    g = br.ReadByte();
+                                    b = br.ReadByte();
+                                    bmp.SetPixel(j, i, Color.FromArgb(255, r, g, b));
+                                }
+                                catch(System.Exception ex)
+                                {
+                                    textBox1.Text = i.ToString() + j.ToString();
+                                }
+                            }
+                        }               
+                        pictureBox1.Image = bmp;
                     }
+
+                    
                 }
-                
-                pictureBox1.Image = bmp;
-                br.Close();
-                sr.Close();
-                ms.Close();
+
+
 
             }
 
