@@ -56,7 +56,8 @@ namespace test1
         private int frame_size_ptr;
         */
         private Byte[][] abuf;
-        private string songList_path = @"./songList.txt";
+        private string songList_path;
+        private int delete;
 
 
         private void trackBar1_Scroll(object sender, EventArgs e)
@@ -242,15 +243,7 @@ namespace test1
 
         }
 
-        private void songList_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void songList_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
+       
 
 
         /*
@@ -554,6 +547,25 @@ namespace test1
 
         private void loadPlayList(string filepath)
         {
+            string[] lines = System.IO.File.ReadAllLines(@filepath);
+            string[] delimiterChars = { "\' \'", "\'" ,"\n"};
+            foreach (string line in lines)
+            {
+                DataGridViewRow row = (DataGridViewRow)songList.Rows[0].Clone();
+                string[] words = line.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
+                int i = 0;
+                foreach (string s in words)
+                {
+                    if(String.Compare(s,"NULL",true)==0)
+                    {
+                        row.Cells[i].Value = "N/A";
+                    }
+                    else
+                        row.Cells[i].Value = s;
+                    i++; 
+                }
+                songList.Rows.Add(row);
+            }
 
         }
 
@@ -588,31 +600,13 @@ namespace test1
                     {
                         avi_path = openFileDialog1.FileName;
                         avi = 0;
-                        popupForm popup = new popupForm();
-                        DialogResult dialogresult = popup.ShowDialog();
-                        if (dialogresult == DialogResult.OK)
-                        {
-                            string title = popup.title;
-                            string singer = popup.singer;
-                            string album = popup.album;
-                            DataGridViewRow row = (DataGridViewRow)songList.Rows[0].Clone();
-                            row.Cells[0].Value = title;
-                            row.Cells[1].Value = singer;
-                            row.Cells[2].Value = album;
-                            songList.Rows.Add(row);
-                        }
-                        popup.Dispose();
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(songList_path, true))
-                        {
-                            file.WriteLine("\"" + popup.title + "\" \"" + popup.singer + "\" \"" + popup.album + "\"");
-                        }
-
                     }
 
                 }
                 else if (openFileDialog1.FilterIndex == 2)            /*txt*/
                 {
-                    loadPlayList(openFileDialog1.FileName);
+                    songList_path = openFileDialog1.FileName;
+                    loadPlayList(songList_path);
                 }
             }
             openFileDialog1.FileName = "";
@@ -672,6 +666,83 @@ namespace test1
 
         private UdpClient uc;
 
+        private void addSong_Click(object sender, EventArgs e)
+        {
+            popupForm popup = new popupForm();
+            DialogResult dialogresult = popup.ShowDialog();
+            string title = popup.title;
+            string singer = popup.singer;
+            string album = popup.album;
+            if (title == null)
+                title = "NULL";
+            if (singer == null)
+                singer = "NULL";
+            if (album == null)
+                album = "NULL";
+            if (dialogresult == DialogResult.OK)
+            {
+                DataGridViewRow row = (DataGridViewRow)songList.Rows[0].Clone();
+                row.Cells[0].Value = avi_path;
+                row.Cells[1].Value = title;
+                row.Cells[2].Value = singer;
+                row.Cells[3].Value = album;
+                songList.Rows.Add(row);
+            }
+            popup.Dispose();
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(songList_path, true))
+            {
+                file.WriteLine("\'" + avi_path + "\' \'" + title + "\' \'" + singer + "\' \'" + album + "\'");
+            }
+        }
+
+        private void songList_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            t.Stop();
+            aStop();
+            avi_path = songList.Rows[e.RowIndex].Cells[0].Value.ToString();
+            avi = 0;
+            button1.Text = "Play";
+        }
+
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void songList_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
+        {
+            delete = e.RowIndex;
+        }
+        private void deleteList_Click(object sender, EventArgs e)
+        {
+            int line_number = 0;
+            string line_empty = null;
+            string tempFile = Path.GetTempFileName();
+            foreach (DataGridViewRow item in this.songList.SelectedRows)
+            {
+                songList.Rows.RemoveAt(item.Index);
+            }
+            using (StreamReader reader = new StreamReader(songList_path))
+            {
+                using (StreamWriter writer = new StreamWriter(tempFile))
+                {
+                    while ((line_empty = reader.ReadLine()) != null)
+                    {
+                        line_number++;
+
+                        if (line_number == (delete+1))
+                            continue;
+
+                        writer.WriteLine(line_empty);
+                    }
+                }
+            }
+            File.Delete(songList_path);
+            File.Move(tempFile, songList_path);
+
+
+
+        }
 
         private byte[] testppm;
         private int packet_count;

@@ -1,4 +1,4 @@
-﻿'SHE.avi' '半糖主義' 'SHE' 'super star'
+'SHE.avi' '半糖主義' 'SHE' 'super star'
 'SHE_uncompressed.avi' '半糖主義' 'SHE' 'super star'
-'only_time.avi' 'only time' 'Enya' 'A Day Without Rain' 
+'only_time.avi' 'only time' 'Enya' 'A Day Without Rain'
 'sample_video.avi' 'Test' 'NULL' 'NULL'
