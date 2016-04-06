@@ -756,7 +756,7 @@ namespace test1
         
 
         [StructLayout(LayoutKind.Sequential,Pack =1)]
-        private struct packet
+        private struct packet               //packet structure, modify if necessary. if modified, remember to modify packet2array and array2packet, and all building packet processes accordingly
         {
             public byte code;
             public int senderIP;
@@ -767,7 +767,7 @@ namespace test1
             public byte[] data;
         };
 
-        private enum packetCode : byte
+        private enum packetCode : byte      //define available packet code
         {
             Ack,
             Reply,
@@ -782,7 +782,7 @@ namespace test1
             packet_count++;
         }
 
-        private void sendTest(IPEndPoint ipep, int i)
+        private void sendTest(IPEndPoint ipep, int i,int peer)
         {
             using (FileStream fs = File.OpenRead("1.ppm"))
             {
@@ -799,7 +799,7 @@ namespace test1
                 bool flag = true;
                 while(flag)
                 {
-                    if(j%peer_no==i)
+                    if(j%peer==i)
                     {
                         long remain = (fs.Length - fs.Position);
 
@@ -880,17 +880,18 @@ namespace test1
                 IPEndPoint ipep0 = new IPEndPoint(IPAddress.Parse(peerIP[0]), port);
                 IPEndPoint ipep1 = new IPEndPoint(IPAddress.Parse(peerIP[1]), port);
                 UdpClient uc = new UdpClient();
-                packet p = new packet();
+                packet p = new packet();        //Start building the packet to send
                 p.code = (byte)packetCode.TestRequest;
                 p.senderIP = BitConverter.ToInt32(IPAddress.Parse(localIP).GetAddressBytes(), 0);
                 p.frameNo = 0;
                 p.order = 0;
                 p.total = 1;
-                p.size = 1;
+                p.size = 2;
                 p.data = new byte[p.size];
-                p.data[0] = 0;
-                byte[] b = packet2array(p);
-                uc.Send(b,b.Length ,ipep0);
+                p.data[0] = 0;                  //index of the peer , i.e. 0 responsible for the even number portion, a responsible for the odd number portion.
+                p.data[1] = 2;                  //number of peer responsible to send the file 
+                byte[] b = packet2array(p);     //Convert the packet to byte array
+                uc.Send(b,b.Length ,ipep0);     //send out the packet
                 p.data[0] = 1;
                 b = packet2array(p);
                 uc.Send(b, b.Length, ipep1);
@@ -901,14 +902,15 @@ namespace test1
                 IPEndPoint ipep0 = new IPEndPoint(IPAddress.Parse(peerIP[0]), port);
                 UdpClient uc = new UdpClient();
                 packet p = new packet();
-                p.code = (byte)packetCode.Ack;
+                p.code = (byte)packetCode.TestRequest;
                 p.senderIP = localIP==""?0:BitConverter.ToInt32(IPAddress.Parse(localIP).GetAddressBytes(), 0);
                 p.frameNo = 0;
                 p.order = 0;
                 p.total = 1;
-                p.size = 1;
+                p.size = 2;
                 p.data = new byte[p.size];
                 p.data[0] = 0;
+                p.data[1] = 1;
                 byte[] b = packet2array(p);
                 uc.Send(b, b.Length, ipep0);
             }
@@ -917,7 +919,7 @@ namespace test1
                 IPEndPoint ipep1 = new IPEndPoint(IPAddress.Parse(peerIP[1]), port);
                 UdpClient uc = new UdpClient();
                 packet p = new packet();
-                p.code = (byte)packetCode.Ack;
+                p.code = (byte)packetCode.TestRequest;
                 p.senderIP = localIP == "" ? 0 : BitConverter.ToInt32(IPAddress.Parse(localIP).GetAddressBytes(), 0);
                 p.frameNo = 0;
                 p.order = 0;
@@ -925,6 +927,7 @@ namespace test1
                 p.size = 1;
                 p.data = new byte[p.size];
                 p.data[0] = 0;
+                p.data[1] = 1;
                 byte[] b = packet2array(p);
                 uc.Send(b, b.Length, ipep1);
             }
@@ -966,7 +969,7 @@ namespace test1
                 }
                 uc = new UdpClient(ipep.Port);
                 backgroundWorker1.WorkerReportsProgress = true;
-                backgroundWorker1.RunWorkerAsync();
+                backgroundWorker1.RunWorkerAsync();             //background worker act as the server thread
             }
             
 
@@ -991,22 +994,22 @@ namespace test1
             }
         }
 */
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)             
         {
    
             while((!done) && (!backgroundWorker1.CancellationPending))
             {
                 IPEndPoint senderIPEP = new IPEndPoint(IPAddress.Any, port);
                 backgroundWorker1.ReportProgress(0, "Receiving packet");
-                byte[] b = uc.Receive(ref senderIPEP);
-                packet p = array2packet(b);
-                senderIPEP = new IPEndPoint(new IPAddress(BitConverter.GetBytes(p.senderIP)),port);
+                byte[] b = uc.Receive(ref senderIPEP);                  //blocking call that receive a packet
+                packet p = array2packet(b);                             //convert received byte array to pakcet structure
+                senderIPEP = new IPEndPoint(new IPAddress(BitConverter.GetBytes(p.senderIP)),port);  //get the sender ip end point
                 
-                switch (p.code)
+                switch (p.code)                 //Switch jobs according to the p.code 
                 {
-                    case (byte)packetCode.Ack:                  
+                    case (byte)packetCode.Ack:                  //acknowledgement packet, just for testing
                         backgroundWorker1.ReportProgress(0, "Received Ack");
-                        packet reply = new packet();
+                        packet reply = new packet();            //build a reply packet
                         reply.code = (byte)packetCode.Reply;
                         reply.senderIP = localIP == "" ? 0 : BitConverter.ToInt32(IPAddress.Parse(localIP).GetAddressBytes(), 0);
                         reply.frameNo = 0;
@@ -1018,33 +1021,33 @@ namespace test1
                         b = packet2array(reply);
                         uc.Send(b, b.Length, senderIPEP);
                         break;
-                    case (byte)packetCode.Reply:
-                        sendTest(senderIPEP, 0);
+                    case (byte)packetCode.Reply:            //Reply acknowledgement packet, just for testing
                         backgroundWorker1.ReportProgress(0, "Received Ack reply");
                         break;
-                    case (byte)packetCode.TestRequest:
-                        sendTest(senderIPEP, p.data[0]);
+                    case (byte)packetCode.TestRequest:      //Packet that ask for the interleaveing test (1.ppm)
+                        sendTest(senderIPEP, p.data[0],p.data[1]);
                         backgroundWorker1.ReportProgress(0, "Acknowledge test request");
                         break;
-                    case (byte)packetCode.TestFilePart:
+                    case (byte)packetCode.TestFilePart:     //Packet of part of 1.ppm
                         if (testppm == null)
                         {
-                            testppm = new byte[p.total * packet_size];
+                            testppm = new byte[p.total * packet_size];      //Construct the array for storing 1.ppm
                             packet_count = 0;
                         }
-                        assembleTest(p);
-                        if (packet_count == p.total)
+                        assembleTest(p);                    //Assemble the packet
+                        if (packet_count == p.total)        //If received enough packet
                         {
-                            backgroundWorker1.ReportProgress(0, "Display test ppm");
+                            backgroundWorker1.ReportProgress(0, "Display test ppm");        //send signal to rais the progress changed event to display the image
                         }
                         break;
+                    //TO DO add other packet code necessary for streaming video and audio, unlike sending 1.ppm, sending video stream should open new thread
                 }
             }
 
 
 
         }
-        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)       //Run when backgroundworker report progress
         {
             if ((string)e.UserState=="Receiving packet")
             {
@@ -1057,7 +1060,7 @@ namespace test1
             }
             
             if ((string)e.UserState == "Display test ppm")
-            {
+            {                                                               //Read the ppm file and build a bitmap to display
                 using (MemoryStream ms = new MemoryStream(testppm))
                 {
                     using (BinaryReader br = new BinaryReader(ms))
