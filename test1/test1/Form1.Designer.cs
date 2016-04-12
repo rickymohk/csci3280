@@ -49,10 +49,6 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.deleteList = new System.Windows.Forms.Button();
@@ -63,7 +59,6 @@
             this.menuStrip2.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
-            this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -88,9 +83,9 @@
             // 
             this.addSong.Dock = System.Windows.Forms.DockStyle.Fill;
             this.addSong.Enabled = false;
-            this.addSong.Location = new System.Drawing.Point(385, 279);
+            this.addSong.Location = new System.Drawing.Point(379, 304);
             this.addSong.Name = "addSong";
-            this.addSong.Size = new System.Drawing.Size(137, 31);
+            this.addSong.Size = new System.Drawing.Size(137, 34);
             this.addSong.TabIndex = 15;
             this.addSong.Text = "Add Song to List";
             this.addSong.UseVisualStyleBackColor = true;
@@ -108,14 +103,14 @@
             this.album});
             this.tableLayoutPanel1.SetColumnSpan(this.songList, 2);
             this.songList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.songList.Location = new System.Drawing.Point(385, 31);
+            this.songList.Location = new System.Drawing.Point(379, 33);
             this.songList.Name = "songList";
             this.songList.ReadOnly = true;
             this.songList.RowHeadersVisible = false;
             this.tableLayoutPanel1.SetRowSpan(this.songList, 2);
             this.songList.RowTemplate.Height = 24;
             this.songList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.songList.Size = new System.Drawing.Size(271, 242);
+            this.songList.Size = new System.Drawing.Size(277, 265);
             this.songList.TabIndex = 14;
             this.songList.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.songList_CellClick_1);
             this.songList.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.songList_CellDoubleClick);
@@ -156,7 +151,7 @@
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 3);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(653, 22);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(653, 24);
             this.flowLayoutPanel2.TabIndex = 13;
             // 
             // menuStrip1
@@ -166,7 +161,7 @@
             this.filesFToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(69, 22);
+            this.menuStrip1.Size = new System.Drawing.Size(69, 24);
             this.menuStrip1.TabIndex = 7;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -177,7 +172,7 @@
             this.filesFToolStripMenuItem.Name = "filesFToolStripMenuItem";
             this.filesFToolStripMenuItem.ShortcutKeyDisplayString = "F";
             this.filesFToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F)));
-            this.filesFToolStripMenuItem.Size = new System.Drawing.Size(61, 18);
+            this.filesFToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.filesFToolStripMenuItem.Text = "Files (F)";
             this.filesFToolStripMenuItem.Click += new System.EventHandler(this.filesFToolStripMenuItem_Click);
             // 
@@ -195,7 +190,7 @@
             this.connectionToolStripMenuItem});
             this.menuStrip2.Location = new System.Drawing.Point(69, 0);
             this.menuStrip2.Name = "menuStrip2";
-            this.menuStrip2.Size = new System.Drawing.Size(112, 22);
+            this.menuStrip2.Size = new System.Drawing.Size(112, 24);
             this.menuStrip2.TabIndex = 11;
             this.menuStrip2.Text = "menuStrip2";
             // 
@@ -206,7 +201,7 @@
             this.testToolStripMenuItem});
             this.connectionToolStripMenuItem.Name = "connectionToolStripMenuItem";
             this.connectionToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.C)));
-            this.connectionToolStripMenuItem.Size = new System.Drawing.Size(104, 18);
+            this.connectionToolStripMenuItem.Size = new System.Drawing.Size(104, 20);
             this.connectionToolStripMenuItem.Text = "Connection (C)";
             // 
             // p2PConnectionToolStripMenuItem
@@ -229,9 +224,9 @@
             this.flowLayoutPanel1.Controls.Add(this.button1);
             this.flowLayoutPanel1.Controls.Add(this.button3);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 279);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 304);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(281, 31);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(276, 34);
             this.flowLayoutPanel1.TabIndex = 12;
             // 
             // button1
@@ -240,7 +235,7 @@
             this.button1.AutoSize = true;
             this.button1.Location = new System.Drawing.Point(3, 3);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(50, 28);
+            this.button1.Size = new System.Drawing.Size(50, 30);
             this.button1.TabIndex = 1;
             this.button1.Text = "Play";
             this.button1.UseVisualStyleBackColor = true;
@@ -251,7 +246,7 @@
             this.button3.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.button3.Location = new System.Drawing.Point(59, 3);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(100, 28);
+            this.button3.Size = new System.Drawing.Size(100, 30);
             this.button3.TabIndex = 5;
             this.button3.Text = "ScreenShot";
             this.button3.UseVisualStyleBackColor = true;
@@ -260,56 +255,22 @@
             // trackBar1
             // 
             this.trackBar1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.trackBar1.Location = new System.Drawing.Point(290, 279);
+            this.trackBar1.Location = new System.Drawing.Point(285, 304);
             this.trackBar1.Maximum = 100;
             this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(89, 31);
+            this.trackBar1.Size = new System.Drawing.Size(88, 34);
             this.trackBar1.TabIndex = 10;
             this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
-            // 
-            // textBox1
-            // 
-            this.tableLayoutPanel1.SetColumnSpan(this.textBox1, 4);
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Location = new System.Drawing.Point(3, 337);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(376, 179);
-            this.textBox1.TabIndex = 9;
-            // 
-            // statusStrip1
-            // 
-            this.tableLayoutPanel1.SetColumnSpan(this.statusStrip1, 4);
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1,
-            this.toolStripStatusLabel2});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 313);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(382, 21);
-            this.statusStrip1.TabIndex = 6;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
-            // toolStripStatusLabel1
-            // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(129, 16);
-            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
-            // 
-            // toolStripStatusLabel2
-            // 
-            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-            this.toolStripStatusLabel2.Size = new System.Drawing.Size(129, 16);
-            this.toolStripStatusLabel2.Text = "toolStripStatusLabel2";
             // 
             // pictureBox1
             // 
             this.pictureBox1.BackColor = System.Drawing.SystemColors.WindowText;
             this.tableLayoutPanel1.SetColumnSpan(this.pictureBox1, 4);
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 51);
+            this.pictureBox1.Location = new System.Drawing.Point(3, 55);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(376, 222);
+            this.pictureBox1.Size = new System.Drawing.Size(370, 243);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
@@ -325,8 +286,6 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.Controls.Add(this.pictureBox1, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.statusStrip1, 0, 4);
-            this.tableLayoutPanel1.Controls.Add(this.textBox1, 0, 5);
             this.tableLayoutPanel1.Controls.Add(this.trackBar1, 3, 3);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel2, 0, 0);
@@ -337,15 +296,13 @@
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 6;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowCount = 4;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 22F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 185F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(659, 519);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 22F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(659, 341);
             this.tableLayoutPanel1.TabIndex = 0;
             this.tableLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel1_Paint);
             // 
@@ -353,9 +310,9 @@
             // 
             this.deleteList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.deleteList.Enabled = false;
-            this.deleteList.Location = new System.Drawing.Point(528, 279);
+            this.deleteList.Location = new System.Drawing.Point(522, 304);
             this.deleteList.Name = "deleteList";
-            this.deleteList.Size = new System.Drawing.Size(128, 31);
+            this.deleteList.Size = new System.Drawing.Size(134, 34);
             this.deleteList.TabIndex = 16;
             this.deleteList.Text = "Delete";
             this.deleteList.UseVisualStyleBackColor = true;
@@ -367,18 +324,18 @@
             this.info.BackColor = System.Drawing.SystemColors.Info;
             this.tableLayoutPanel1.SetColumnSpan(this.info, 4);
             this.info.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.info.Location = new System.Drawing.Point(3, 28);
+            this.info.Location = new System.Drawing.Point(3, 30);
             this.info.Name = "info";
-            this.info.Size = new System.Drawing.Size(376, 20);
+            this.info.Size = new System.Drawing.Size(370, 22);
             this.info.TabIndex = 17;
             this.info.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.info.Click += new System.EventHandler(this.label1_Click);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(659, 519);
+            this.ClientSize = new System.Drawing.Size(659, 341);
             this.Controls.Add(this.tableLayoutPanel1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
@@ -394,8 +351,6 @@
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
@@ -415,10 +370,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn album;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TrackBar trackBar1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Button button1;

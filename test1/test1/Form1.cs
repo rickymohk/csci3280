@@ -127,8 +127,7 @@ namespace test1
             if (hasAudio && abuf[abuf_i] != null)
             {
                 aPlayer.Volume = vol;
-                toolStripStatusLabel1.Text = aPlayer.Volume.Left.ToString();
-                toolStripStatusLabel2.Text = aPlayer.Volume.Right.ToString();
+
                 count2++;
 
                 aPlayer.Write(abuf[abuf_i]);
@@ -290,7 +289,7 @@ namespace test1
                     sample_rate = pWave.nSamplesPerSec;
 
                     sample_size = pWave.wBitsPerSample;
-                    toolStripStatusLabel1.Text = sample_size.ToString();
+    
                     channels = pWave.nChannels;
                     lstart = Avi.AVIStreamStart(astream.ToInt32());
                     astream_i = lstart;
@@ -781,8 +780,7 @@ namespace test1
         {
             localIP = local;
             peerIP = ipaddr;
-            toolStripStatusLabel1.Text = peerIP[0];
-            toolStripStatusLabel2.Text = peerIP[1];
+
             peer_no = 0;
             if(peerIP[0]!="")
             {
@@ -868,12 +866,11 @@ namespace test1
         {
             if ((string)e.UserState=="Receiving packet")
             {
-                toolStripStatusLabel2.Text = (string)e.UserState;
+     
             }
             else
             {
-                toolStripStatusLabel2.Text = "";
-                textBox1.Text = (string)e.UserState;
+
             }
             
             if ((string)e.UserState == "Display test ppm")
@@ -905,7 +902,7 @@ namespace test1
                                 }
                                 catch(System.Exception ex)
                                 {
-                                    textBox1.Text = i.ToString() + j.ToString();
+     
                                 }
                             }
                         }               
