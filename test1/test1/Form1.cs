@@ -555,6 +555,34 @@ namespace test1
         {
             string[] lines = System.IO.File.ReadAllLines(@filepath);
             string[] delimiterChars = { "\' \'", "\'" ,"\n"};
+
+            for (int i = songList.Rows.Count - 2; i >= 0; i--)
+            {
+                songList.Rows.RemoveAt(i);
+            }
+ /*           while ((listrow.Cells[0].Value != null) && (listrow.Cells[1].Value != null) && (listrow.Cells[2].Value != null) && (listrow.Cells[3].Value != null))
+            {
+                songList.Rows.RemoveAt(del);
+                del++;
+                if (songList.Rows[del].Index == -1) {
+                    break;
+                }
+                else
+                    listrow = (DataGridViewRow)songList.Rows[del];
+
+            }
+
+            foreach (DataGridViewRow item in this.songList.Rows)
+            {
+                if ((item.Cells[0].Value == null) && (item.Cells[1].Value == null) && (item.Cells[2].Value == null) && (item.Cells[3].Value == null))
+                {
+                    break;
+                }
+                else
+                {
+                    songList.Rows.RemoveAt(item.Index);
+                }
+            }*/
             foreach (string line in lines)
             {
                 DataGridViewRow row = (DataGridViewRow)songList.Rows[0].Clone();
@@ -562,13 +590,13 @@ namespace test1
                 int i = 0;
                 foreach (string s in words)
                 {
-                    if(String.Compare(s,"NULL",true)==0)
+                    if (s == "NULL")
                     {
                         row.Cells[i].Value = "N/A";
                     }
                     else
                         row.Cells[i].Value = s;
-                    i++; 
+                    i++;
                 }
                 songList.Rows.Add(row);
             }
@@ -613,6 +641,8 @@ namespace test1
                 {
                     songList_path = openFileDialog1.FileName;
                     loadPlayList(songList_path);
+                    deleteList.Enabled = true;
+                    addSong.Enabled = true;
                 }
             }
             openFileDialog1.FileName = "";
@@ -679,22 +709,37 @@ namespace test1
             string title = popup.title;
             string singer = popup.singer;
             string album = popup.album;
-            if (title == null)
+            if (title == "")
                 title = "NULL";
-            if (singer == null)
+            if (singer == "")
                 singer = "NULL";
-            if (album == null)
+            if (album == "")
                 album = "NULL";
             if (dialogresult == DialogResult.OK)
             {
                 DataGridViewRow row = (DataGridViewRow)songList.Rows[0].Clone();
                 row.Cells[0].Value = avi_path;
-                row.Cells[1].Value = title;
-                row.Cells[2].Value = singer;
-                row.Cells[3].Value = album;
+                if (title == "NULL")
+                {
+                    row.Cells[1].Value = "N/A";
+                }
+                else
+                    row.Cells[1].Value = title;
+                if (singer == "NULL")
+                {
+                    row.Cells[2].Value = "N/A";
+                }
+                else
+                    row.Cells[2].Value = singer;
+                if (album == "NULL")
+                {
+                    row.Cells[3].Value = "N/A";
+                }
+                else
+                    row.Cells[3].Value = album;
                 songList.Rows.Add(row);
             }
-            popup.Dispose();
+                popup.Dispose();
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(songList_path, true))
             {
                 file.WriteLine("\'" + avi_path + "\' \'" + title + "\' \'" + singer + "\' \'" + album + "\'");
@@ -726,25 +771,37 @@ namespace test1
             string tempFile = Path.GetTempFileName();
             foreach (DataGridViewRow item in this.songList.SelectedRows)
             {
-                songList.Rows.RemoveAt(item.Index);
-            }
-            using (StreamReader reader = new StreamReader(songList_path))
-            {
-                using (StreamWriter writer = new StreamWriter(tempFile))
+                if ((item.Cells[0].Value == null) && (item.Cells[1].Value == null) && (item.Cells[2].Value == null) && (item.Cells[3].Value == null))
                 {
-                    while ((line_empty = reader.ReadLine()) != null)
+                    MessageBox.Show("Song List's row is empty.");
+                }
+                else
+                    songList.Rows.RemoveAt(item.Index);
+            }
+            if (songList_path == null)
+            {
+                MessageBox.Show("No song list is added.");
+            }
+            else {
+                using (StreamReader reader = new StreamReader(songList_path))
+                {
+                    using (StreamWriter writer = new StreamWriter(tempFile))
                     {
-                        line_number++;
+                        while ((line_empty = reader.ReadLine()) != null)
+                        {
+                            line_number++;
 
-                        if (line_number == (delete+1))
-                            continue;
+                            if (line_number == (delete + 1))
+                                continue;
 
-                        writer.WriteLine(line_empty);
+                            writer.WriteLine(line_empty);
+                        }
                     }
                 }
+                File.Delete(songList_path);
+                File.Move(tempFile, songList_path);
+
             }
-            File.Delete(songList_path);
-            File.Move(tempFile, songList_path);
 
 
 
