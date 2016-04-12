@@ -15,7 +15,6 @@ using System.Net.Sockets;
 using AForge.Video.FFMPEG;
 using Multimedia;
 using AviFile;
-//using SharpFFmpeg;
 using WinMM;
 
 namespace test1
@@ -29,7 +28,7 @@ namespace test1
 
 
         private bool hasAudio;
-        //        private AudioOutputDevice aPlayer;
+
         private WaveOut aPlayer;
         Volume vol;
         private IntPtr astream, wavedata;     //ppavi
@@ -47,15 +46,7 @@ namespace test1
         private long frame_i, max_frame;
         private int fps, duration;
         private long count, count2;
-        /*
-        private IntPtr pFormatCtx;
-        private FFmpeg.AVFormatContext FormatCtx;
-        private IntPtr pAudioCodecCtx;
-        private FFmpeg.AVCodecContext AudioCodecCtx;
-        private IntPtr pAudioCodec;
-        private IntPtr pSamples;
-        private int frame_size_ptr;
-        */
+
         private Byte[][] abuf;
         private string songList_path;
         private int delete;
@@ -67,20 +58,6 @@ namespace test1
             vol.Right = (float)trackBar1.Value / 100;
         }
 
-  /*      private void listView1_MouseClick(object sender, MouseEventArgs e)
-        {
-            String file = songList.SelectedItems[0].SubItems[3].Text;
-            toolStripStatusLabel1.Text = file;
-            if (avi_path != file)
-            {
-                avi_path = file;
-                avi = 0;
-            }
-        } */
-
-
-
-        //private float[][] abuf;
 
 
         private int abuf_size, abuf_i;
@@ -88,14 +65,7 @@ namespace test1
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            /*          String file = listView1.SelectedItems[0].SubItems[3].Text;
-                      toolStripStatusLabel1.Text = file;
-                      if(avi_path != file)
-                      {
-                          avi_path = file;
-                          avi = 0;
-                      }
-                     */
+
 
         }
 
@@ -103,13 +73,11 @@ namespace test1
         {
             InitializeComponent();
             Avi.AVIFileInit();
-            //   FFmpeg.av_register_all();
             avi = 0;
             hasAudio = false;
             reader = new VideoFileReader();
             vbuf = new Bitmap[2];
             abuf = new Byte[2][];
-            //abuf = new float[2][];
             t = new Multimedia.Timer();
             t.Tick += new System.EventHandler(this.nextFrame);
             t.SynchronizingObject = this;
@@ -152,44 +120,23 @@ namespace test1
                 button1.Text = "Play";
                 t.Stop();
             }
-            /*
-                        if(abuf[abuf_i] != null)
-                        {
-                            textBox1.Text = sample_rate.ToString();
-                            if (astream_i<(astreamLength-abuf_size))
-                            {
-                                Marshal.Copy(waveData, abuf[abuf_i], astream_i, abuf_size);
-                                astream_i += abuf_size;
-                            }
-                            else if(astream_i<astreamLength)
-                            {
-                                Marshal.Copy(waveData, abuf[abuf_i], astream_i, astreamLength-astream_i);
-                                astream_i += abuf_size;
-                            }
-                            else
-                            {
-                                abuf[abuf_i] = null;
-                            }
-                            abuf_i = 1 - abuf_i;
-                        }
-            */
+
 
 
 
             if (hasAudio && abuf[abuf_i] != null)
-            //     if(true)
             {
                 aPlayer.Volume = vol;
                 toolStripStatusLabel1.Text = aPlayer.Volume.Left.ToString();
                 toolStripStatusLabel2.Text = aPlayer.Volume.Right.ToString();
                 count2++;
-                //        Marshal.Copy(abuf[abuf_i], 0, data, size);
+
                 aPlayer.Write(abuf[abuf_i]);
                 if (astream != null && astream_i < lstart + len)
                 {
                     count++;
                     err = Avi.AVIStreamRead(astream, astream_i, lsamples, wavedata, abuf_size, temp1.ToInt32(), temp2.ToInt32());
-                    //     err = FFmpeg.avcodec_decode_audio(pAudioCodecCtx, pSamples, out frame_size_ptr, wavedata, abuf_size);
+
                     if (err == 0)
                     {
                         astream_i += lsamples;
@@ -203,12 +150,7 @@ namespace test1
                 }
                 else
                 {
-                    /*
-                    for (int i = 0; i < abuf_size ; i++)
-                    {
-                        abuf[abuf_i][i] = 0;
-                    }
-                    */
+
                     abuf[abuf_i] = null;
                 }
             }
@@ -245,64 +187,13 @@ namespace test1
 
         }
 
-       
 
-
-        /*
-                private void afiller(object sender, Accord.Audio.NewFrameRequestedEventArgs arg )
-                {
-                    arg.Frames = 8*abuf_size / sample_size / channels;
-                    if (abuf[abuf_i]!=null)
-                    {
-                        int n = sample_size / 8;
-                        if(n==0)
-                        {
-                            n = 1;
-                        }
-                        for(int i=0;i< abuf_size-n;i+=n)
-                        {
-                            float sample = 0;
-                            for (int j= i;j<i+ n;j++)
-                            {
-                                sample = sample*256;
-                                sample += abuf[abuf_i][j];
-                            }
-                            sample /= (float)Math.Pow(2, sample_size-1);
-                            arg.Buffer[i / n] = sample;
-                        }
-
-                        if (astream != null)
-                        {
-                            Avi.AVIStreamRead(astream, astream_i, 8 * abuf_size / sample_size / channels, wavedata, abuf_size, 0, 0);
-                            astream_i += 8* abuf_size / sample_size  / channels;
-                            Marshal.Copy(wavedata, abuf[abuf_i], 0, abuf_size);
-                        }
-                        else
-                        {
-                            for (int i = 0; i < abuf_size / 4; i++)
-                            {
-                                abuf[abuf_i][i] = 0;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        aStop();
-                    }
-                    abuf_i = 1 - abuf_i;
-
-
-                }
-        */
         private void aPlay()
         {
             aStop();
             if (astream != null)
             {
 
-                // aPlayer = new AudioOutputDevice(Handle, sample_rate, channels);
-                // aPlayer.NewFrameRequested += new EventHandler<Accord.Audio.NewFrameRequestedEventArgs>(afiller);
-                // aPlayer.Play();
                 try
                 {
                     aPlayer = new WaveOut(-1);
@@ -328,112 +219,6 @@ namespace test1
 
         private int play(String filepath)
         {
-            /*
-                       if (avi == 0)
-                       {
-
-                           if (FFmpeg.av_open_input_file(out pFormatCtx, filepath, IntPtr.Zero, 0, IntPtr.Zero) < 0)
-                           {
-                               MessageBox.Show("Cannot open file");
-                           }
-                           else if ( FFmpeg.av_find_stream_info(pFormatCtx) < 0)
-                           {
-                               MessageBox.Show("Cannot find stream info");
-                           }
-                           else
-                           {
-                               avi = 1;
-                               FormatCtx = new FFmpeg.AVFormatContext();
-
-                               FormatCtx = (FFmpeg.AVFormatContext)Marshal.PtrToStructure(pFormatCtx, typeof(FFmpeg.AVFormatContext));
-                               int audioStream = -1;
-                               hasAudio = false;
-                               for (int i = 0; i < FormatCtx.nb_streams; i++)
-                               {
-                                   FFmpeg.AVStream stream = (FFmpeg.AVStream)Marshal.PtrToStructure(FormatCtx.streams[i], typeof(FFmpeg.AVStream));
-                                   FFmpeg.AVCodecContext codec = (FFmpeg.AVCodecContext)Marshal.PtrToStructure(stream.codec, typeof(FFmpeg.AVCodecContext));
-                                   if (codec.codec_type == FFmpeg.CodecType.CODEC_TYPE_AUDIO && audioStream == -1)
-                                   {
-                                       audioStream = i;
-                                       hasAudio = true;
-                                       pAudioCodecCtx = stream.codec;
-                                       AudioCodecCtx = codec;
-                                       pAudioCodec = FFmpeg.avcodec_find_decoder(AudioCodecCtx.codec_id);
-                                       if (pAudioCodec == IntPtr.Zero)
-                                       {
-                                           MessageBox.Show("Connot find audio decoder");
-                                       }
-                                       else
-                                       {
-                                           FFmpeg.avcodec_open(stream.codec, pAudioCodec);
-                                           sample_rate = AudioCodecCtx.sample_rate;
-                                           channels = AudioCodecCtx.channels;
-                                           sample_size = AudioCodecCtx.bits_per_sample;
-                                           abuf_size = channels * duration * sample_rate * sample_size / 8000;
-                                           lsamples = 8 * abuf_size / sample_size / channels;
-                                           pSamples = Marshal.AllocHGlobal(4);
-                                           Marshal.WriteInt32(pSamples, lsamples);
-                                           abuf[0] = new Byte[abuf_size];
-                                           abuf[1] = new Byte[abuf_size];
-                                           if (wavedata != null)
-                                               Marshal.FreeHGlobal(wavedata);
-                                           wavedata = Marshal.AllocHGlobal(abuf_size);
-                                           frame_size_ptr = abuf_size;
-                                           FFmpeg.avcodec_decode_audio(pAudioCodecCtx, pSamples, out frame_size_ptr, wavedata, abuf_size);
-                                           Marshal.Copy(wavedata, abuf[0], 0, abuf_size);
-                                           FFmpeg.avcodec_decode_audio(pAudioCodecCtx, pSamples, out frame_size_ptr, wavedata, abuf_size);
-                                           Marshal.Copy(wavedata, abuf[1], 0, abuf_size);
-                                           abuf_i = 0;
-                                       }
-                                   }
-                               }
-                               try
-                               {
-                                   reader.Close();
-                                   reader.Open(avi_path);
-                                   if (reader.IsOpen)
-                                   {
-                                       max_frame = reader.FrameCount;
-                                       frame_i = 0;
-                                       vbuf_i = 0;
-                                       vbuf[0] = reader.ReadVideoFrame();
-                                       vbuf[1] = reader.ReadVideoFrame();
-                                       fps = reader.FrameRate;
-                                       duration = 1000 / fps;
-                                       t.Period = duration;
-                                       t.Start();
-
-                                   }
-                                   else
-                                   {
-                                       MessageBox.Show("Cannot open Video file2");
-                                   }
-                               }
-                               catch (System.IO.IOException e)
-                               {
-                                   if (e.Data.Equals("Cannot open Video file"))
-                                   {
-                                       MessageBox.Show("Cannot open Video file1");
-                                   }
-                               }
-                           }
-                       }
-                       else
-                       {
-                           t.Start();
-                       }
-                       if (hasAudio)
-                       {
-                           Thread aThread = new Thread(new ThreadStart(aPlay));
-                           aThread.Start();
-                       }
-                       else
-                       {
-                           aStop();
-                       }
-
-             */
-
 
             if (avi == 0)
             {
@@ -560,29 +345,7 @@ namespace test1
             {
                 songList.Rows.RemoveAt(i);
             }
- /*           while ((listrow.Cells[0].Value != null) && (listrow.Cells[1].Value != null) && (listrow.Cells[2].Value != null) && (listrow.Cells[3].Value != null))
-            {
-                songList.Rows.RemoveAt(del);
-                del++;
-                if (songList.Rows[del].Index == -1) {
-                    break;
-                }
-                else
-                    listrow = (DataGridViewRow)songList.Rows[del];
 
-            }
-
-            foreach (DataGridViewRow item in this.songList.Rows)
-            {
-                if ((item.Cells[0].Value == null) && (item.Cells[1].Value == null) && (item.Cells[2].Value == null) && (item.Cells[3].Value == null))
-                {
-                    break;
-                }
-                else
-                {
-                    songList.Rows.RemoveAt(item.Index);
-                }
-            }*/
             foreach (string line in lines)
             {
                 DataGridViewRow row = (DataGridViewRow)songList.Rows[0].Clone();
@@ -709,16 +472,18 @@ namespace test1
             string title = popup.title;
             string singer = popup.singer;
             string album = popup.album;
-            if (title == "")
-                title = "NULL";
-            if (singer == "")
-                singer = "NULL";
-            if (album == "")
-                album = "NULL";
+            
             if (dialogresult == DialogResult.OK)
             {
                 DataGridViewRow row = (DataGridViewRow)songList.Rows[0].Clone();
                 row.Cells[0].Value = avi_path;
+                if (title == "")
+                    title = "NULL";
+                if (singer == "")
+                    singer = "NULL";
+                if (album == "")
+                    album = "NULL";
+
                 if (title == "NULL")
                 {
                     row.Cells[1].Value = "N/A";
@@ -737,6 +502,7 @@ namespace test1
                 }
                 else
                     row.Cells[3].Value = album;
+                info.Text = "Song: " + row.Cells[1].Value + " Singer: " + row.Cells[2].Value + " Album: " + row.Cells[3].Value;
                 songList.Rows.Add(row);
             }
                 popup.Dispose();
@@ -746,24 +512,14 @@ namespace test1
             }
         }
 
-        private void songList_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            t.Stop();
-            aStop();
-            avi_path = songList.Rows[e.RowIndex].Cells[0].Value.ToString();
-            avi = 0;
-            button1.Text = "Play";
-        }
+
 
         private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
         {
 
         }
 
-        private void songList_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
-        {
-            delete = e.RowIndex;
-        }
+
         private void deleteList_Click(object sender, EventArgs e)
         {
             int line_number = 0;
@@ -775,8 +531,10 @@ namespace test1
                 {
                     MessageBox.Show("Song List's row is empty.");
                 }
-                else
+                else {
+                    delete = item.Index;
                     songList.Rows.RemoveAt(item.Index);
+                }
             }
             if (songList_path == null)
             {
@@ -791,7 +549,7 @@ namespace test1
                         {
                             line_number++;
 
-                            if (line_number == (delete + 1))
+                            if (line_number == (delete+1))
                                 continue;
 
                             writer.WriteLine(line_empty);
@@ -807,13 +565,34 @@ namespace test1
 
         }
 
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void songList_CellClick_1(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void songList_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            t.Stop();
+            aStop();
+            int load = songList.SelectedRows[0].Index;
+            avi_path = songList.Rows[load].Cells[0].Value.ToString();
+            avi = 0;
+            button1.Text = "Play";
+            info.Text = "Song: " + songList.Rows[e.RowIndex].Cells[1].Value.ToString() + " Singer: " + songList.Rows[e.RowIndex].Cells[2].Value.ToString() + " Album: " + songList.Rows[e.RowIndex].Cells[3].Value.ToString();
+        }
+
         private byte[] testppm;
         private int packet_count;
         private Thread serverThread, clientThread;
         
 
         [StructLayout(LayoutKind.Sequential,Pack =1)]
-        private struct packet               //packet structure, modify if necessary. if modified, remember to modify packet2array and array2packet, and all building packet processes accordingly
+        private struct packet             
         {
             public byte code;
             public int senderIP;
@@ -824,7 +603,7 @@ namespace test1
             public byte[] data;
         };
 
-        private enum packetCode : byte      //define available packet code
+        private enum packetCode : byte    
         {
             Ack,
             Reply,
@@ -937,7 +716,7 @@ namespace test1
                 IPEndPoint ipep0 = new IPEndPoint(IPAddress.Parse(peerIP[0]), port);
                 IPEndPoint ipep1 = new IPEndPoint(IPAddress.Parse(peerIP[1]), port);
                 UdpClient uc = new UdpClient();
-                packet p = new packet();        //Start building the packet to send
+                packet p = new packet();   
                 p.code = (byte)packetCode.TestRequest;
                 p.senderIP = BitConverter.ToInt32(IPAddress.Parse(localIP).GetAddressBytes(), 0);
                 p.frameNo = 0;
@@ -945,10 +724,10 @@ namespace test1
                 p.total = 1;
                 p.size = 2;
                 p.data = new byte[p.size];
-                p.data[0] = 0;                  //index of the peer , i.e. 0 responsible for the even number portion, a responsible for the odd number portion.
-                p.data[1] = 2;                  //number of peer responsible to send the file 
-                byte[] b = packet2array(p);     //Convert the packet to byte array
-                uc.Send(b,b.Length ,ipep0);     //send out the packet
+                p.data[0] = 0;              
+                p.data[1] = 2;               
+                byte[] b = packet2array(p);  
+                uc.Send(b,b.Length ,ipep0);   
                 p.data[0] = 1;
                 b = packet2array(p);
                 uc.Send(b, b.Length, ipep1);
@@ -1013,9 +792,7 @@ namespace test1
             {
                 peer_no++;
             }
-            //            serverThread = new Thread(new ThreadStart(serverMain));
-            //            serverThread.IsBackground = true;
-            //            serverThread.Start();
+
             IPEndPoint ipep = new IPEndPoint(IPAddress.Any, port);
 
             if(peer_no>0)
@@ -1026,31 +803,14 @@ namespace test1
                 }
                 uc = new UdpClient(ipep.Port);
                 backgroundWorker1.WorkerReportsProgress = true;
-                backgroundWorker1.RunWorkerAsync();             //background worker act as the server thread
+                backgroundWorker1.RunWorkerAsync();      
             }
             
 
             
 
         }
-/*
-        public void serverMain()
-        {
-            IPEndPoint ipep = new IPEndPoint(IPAddress.Any, port);
-            UdpClient uc = new UdpClient(ipep.Port);         
-            while(!done)
-            {
-                
-                IPEndPoint senderIPEP = new IPEndPoint(IPAddress.Any, port);
-                byte[] b = uc.Receive(ref senderIPEP);
-                packet p = array2packet(b);
-                p.senderIP = BitConverter.ToInt32(senderIPEP.Address.GetAddressBytes(), 0);
-                while (backgroundWorker1.IsBusy) ;
-                backgroundWorker1.RunWorkerAsync(p);
 
-            }
-        }
-*/
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)             
         {
    
@@ -1058,15 +818,15 @@ namespace test1
             {
                 IPEndPoint senderIPEP = new IPEndPoint(IPAddress.Any, port);
                 backgroundWorker1.ReportProgress(0, "Receiving packet");
-                byte[] b = uc.Receive(ref senderIPEP);                  //blocking call that receive a packet
-                packet p = array2packet(b);                             //convert received byte array to pakcet structure
-                senderIPEP = new IPEndPoint(new IPAddress(BitConverter.GetBytes(p.senderIP)),port);  //get the sender ip end point
+                byte[] b = uc.Receive(ref senderIPEP);               
+                packet p = array2packet(b);                         
+                senderIPEP = new IPEndPoint(new IPAddress(BitConverter.GetBytes(p.senderIP)),port);  
                 
-                switch (p.code)                 //Switch jobs according to the p.code 
+                switch (p.code)               
                 {
-                    case (byte)packetCode.Ack:                  //acknowledgement packet, just for testing
+                    case (byte)packetCode.Ack:            
                         backgroundWorker1.ReportProgress(0, "Received Ack");
-                        packet reply = new packet();            //build a reply packet
+                        packet reply = new packet();         
                         reply.code = (byte)packetCode.Reply;
                         reply.senderIP = localIP == "" ? 0 : BitConverter.ToInt32(IPAddress.Parse(localIP).GetAddressBytes(), 0);
                         reply.frameNo = 0;
@@ -1078,33 +838,33 @@ namespace test1
                         b = packet2array(reply);
                         uc.Send(b, b.Length, senderIPEP);
                         break;
-                    case (byte)packetCode.Reply:            //Reply acknowledgement packet, just for testing
+                    case (byte)packetCode.Reply:        
                         backgroundWorker1.ReportProgress(0, "Received Ack reply");
                         break;
-                    case (byte)packetCode.TestRequest:      //Packet that ask for the interleaveing test (1.ppm)
+                    case (byte)packetCode.TestRequest:    
                         sendTest(senderIPEP, p.data[0],p.data[1]);
                         backgroundWorker1.ReportProgress(0, "Acknowledge test request");
                         break;
-                    case (byte)packetCode.TestFilePart:     //Packet of part of 1.ppm
+                    case (byte)packetCode.TestFilePart:  
                         if (testppm == null)
                         {
-                            testppm = new byte[p.total * packet_size];      //Construct the array for storing 1.ppm
+                            testppm = new byte[p.total * packet_size];   
                             packet_count = 0;
                         }
-                        assembleTest(p);                    //Assemble the packet
-                        if (packet_count == p.total)        //If received enough packet
+                        assembleTest(p);         
+                        if (packet_count == p.total)       
                         {
-                            backgroundWorker1.ReportProgress(0, "Display test ppm");        //send signal to rais the progress changed event to display the image
+                            backgroundWorker1.ReportProgress(0, "Display test ppm");      
                         }
                         break;
-                    //TO DO add other packet code necessary for streaming video and audio, unlike sending 1.ppm, sending video stream should open new thread
+            
                 }
             }
 
 
 
         }
-        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)       //Run when backgroundworker report progress
+        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)   
         {
             if ((string)e.UserState=="Receiving packet")
             {
@@ -1117,7 +877,7 @@ namespace test1
             }
             
             if ((string)e.UserState == "Display test ppm")
-            {                                                               //Read the ppm file and build a bitmap to display
+            {                                                          
                 using (MemoryStream ms = new MemoryStream(testppm))
                 {
                     using (BinaryReader br = new BinaryReader(ms))
@@ -1169,8 +929,6 @@ namespace test1
 
         public void ClientMain(String ip)
         {
- //           IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(ip), port);
- //           UdpClient uc = new UdpClient();
 
         }
     }
