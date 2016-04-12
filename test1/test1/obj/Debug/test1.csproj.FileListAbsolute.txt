@@ -180,13 +180,7 @@ C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\swresample-0.dll
 C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\swscale-2.dll
 C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\test1.exe
 C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\test1.pdb
-C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\Accord.Audio.DirectSound.dll
-C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\Accord.Audio.dll
-C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\Accord.Audio.Formats.dll
-C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\Accord.dll
 C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\AForge.Video.dll
-C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\DirectShowLib-2005.dll
-C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\NAudio.dll
 C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\AForge.dll
 C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\Accord.xml
 C:\Users\Ting\Desktop\3280project\3280\test1\test1\bin\Debug\Accord.Audio.xml

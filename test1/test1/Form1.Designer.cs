@@ -92,9 +92,9 @@
             // 
             this.addSong.Dock = System.Windows.Forms.DockStyle.Fill;
             this.addSong.Enabled = false;
-            this.addSong.Location = new System.Drawing.Point(376, 279);
+            this.addSong.Location = new System.Drawing.Point(371, 304);
             this.addSong.Name = "addSong";
-            this.addSong.Size = new System.Drawing.Size(137, 31);
+            this.addSong.Size = new System.Drawing.Size(137, 28);
             this.addSong.TabIndex = 15;
             this.addSong.Text = "Add Song to List";
             this.addSong.UseVisualStyleBackColor = true;
@@ -112,14 +112,14 @@
             this.album});
             this.tableLayoutPanel1.SetColumnSpan(this.songList, 2);
             this.songList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.songList.Location = new System.Drawing.Point(376, 31);
+            this.songList.Location = new System.Drawing.Point(371, 31);
             this.songList.Name = "songList";
             this.songList.ReadOnly = true;
             this.songList.RowHeadersVisible = false;
             this.tableLayoutPanel1.SetRowSpan(this.songList, 2);
             this.songList.RowTemplate.Height = 24;
             this.songList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.songList.Size = new System.Drawing.Size(280, 242);
+            this.songList.Size = new System.Drawing.Size(285, 267);
             this.songList.TabIndex = 14;
             this.songList.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.songList_CellClick_1);
             this.songList.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.songList_CellContentClick);
@@ -234,9 +234,9 @@
             this.flowLayoutPanel1.Controls.Add(this.button1);
             this.flowLayoutPanel1.Controls.Add(this.button3);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 279);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 304);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(274, 31);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(270, 28);
             this.flowLayoutPanel1.TabIndex = 12;
             // 
             // button1
@@ -245,7 +245,7 @@
             this.button1.AutoSize = true;
             this.button1.Location = new System.Drawing.Point(3, 3);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(70, 28);
+            this.button1.Size = new System.Drawing.Size(50, 28);
             this.button1.TabIndex = 1;
             this.button1.Text = "Play";
             this.button1.UseVisualStyleBackColor = true;
@@ -254,7 +254,7 @@
             // button3
             // 
             this.button3.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.button3.Location = new System.Drawing.Point(79, 3);
+            this.button3.Location = new System.Drawing.Point(59, 3);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(100, 28);
             this.button3.TabIndex = 5;
@@ -265,10 +265,10 @@
             // trackBar1
             // 
             this.trackBar1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.trackBar1.Location = new System.Drawing.Point(283, 279);
+            this.trackBar1.Location = new System.Drawing.Point(279, 304);
             this.trackBar1.Maximum = 100;
             this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(87, 31);
+            this.trackBar1.Size = new System.Drawing.Size(86, 28);
             this.trackBar1.TabIndex = 10;
             this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
@@ -280,7 +280,7 @@
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox1.Location = new System.Drawing.Point(3, 51);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(367, 222);
+            this.pictureBox1.Size = new System.Drawing.Size(362, 247);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
@@ -310,15 +310,17 @@
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 6;
+            this.tableLayoutPanel1.RowCount = 4;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 34F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 163F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 18F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 177F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(659, 519);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(659, 525);
             this.tableLayoutPanel1.TabIndex = 0;
             this.tableLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel1_Paint);
             // 
@@ -326,9 +328,9 @@
             // 
             this.deleteList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.deleteList.Enabled = false;
-            this.deleteList.Location = new System.Drawing.Point(519, 279);
+            this.deleteList.Location = new System.Drawing.Point(514, 304);
             this.deleteList.Name = "deleteList";
-            this.deleteList.Size = new System.Drawing.Size(137, 31);
+            this.deleteList.Size = new System.Drawing.Size(142, 28);
             this.deleteList.TabIndex = 16;
             this.deleteList.Text = "Delete";
             this.deleteList.UseVisualStyleBackColor = true;
@@ -342,7 +344,7 @@
             this.info.Dock = System.Windows.Forms.DockStyle.Fill;
             this.info.Location = new System.Drawing.Point(3, 28);
             this.info.Name = "info";
-            this.info.Size = new System.Drawing.Size(367, 20);
+            this.info.Size = new System.Drawing.Size(362, 20);
             this.info.TabIndex = 17;
             this.info.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.info.Click += new System.EventHandler(this.label1_Click);
@@ -350,9 +352,9 @@
             // Search
             // 
             this.Search.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Search.Location = new System.Drawing.Point(519, 316);
+            this.Search.Location = new System.Drawing.Point(514, 338);
             this.Search.Name = "Search";
-            this.Search.Size = new System.Drawing.Size(137, 23);
+            this.Search.Size = new System.Drawing.Size(142, 21);
             this.Search.TabIndex = 18;
             this.Search.Text = "Search";
             this.Search.UseVisualStyleBackColor = true;
@@ -362,9 +364,9 @@
             // 
             this.tableLayoutPanel1.SetColumnSpan(this.SearchBox, 3);
             this.SearchBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SearchBox.Location = new System.Drawing.Point(3, 316);
+            this.SearchBox.Location = new System.Drawing.Point(3, 338);
             this.SearchBox.Name = "SearchBox";
-            this.SearchBox.Size = new System.Drawing.Size(274, 22);
+            this.SearchBox.Size = new System.Drawing.Size(270, 22);
             this.SearchBox.TabIndex = 19;
             this.SearchBox.TextChanged += new System.EventHandler(this.SearchBox_TextChanged);
             // 
@@ -381,13 +383,13 @@
             this.tableLayoutPanel1.SetColumnSpan(this.SearchList, 6);
             this.SearchList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SearchList.GridColor = System.Drawing.SystemColors.ActiveCaption;
-            this.SearchList.Location = new System.Drawing.Point(3, 345);
+            this.SearchList.Location = new System.Drawing.Point(3, 365);
             this.SearchList.Name = "SearchList";
             this.SearchList.ReadOnly = true;
             this.SearchList.RowHeadersVisible = false;
             this.SearchList.RowTemplate.Height = 24;
             this.SearchList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.SearchList.Size = new System.Drawing.Size(653, 171);
+            this.SearchList.Size = new System.Drawing.Size(653, 157);
             this.SearchList.TabIndex = 20;
             this.SearchList.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SearchList_CellContentClick);
             this.SearchList.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SearchList_CellDoubleClick);
@@ -426,9 +428,9 @@
             this.label1.AutoSize = true;
             this.tableLayoutPanel1.SetColumnSpan(this.label1, 2);
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label1.Location = new System.Drawing.Point(283, 313);
+            this.label1.Location = new System.Drawing.Point(279, 335);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(230, 29);
+            this.label1.Size = new System.Drawing.Size(229, 27);
             this.label1.TabIndex = 21;
             this.label1.Text = "Keywords should be divided by comma (e.g. ABC,DEF,GHI)";
             // 
@@ -436,7 +438,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(659, 519);
+            this.ClientSize = new System.Drawing.Size(659, 525);
             this.Controls.Add(this.tableLayoutPanel1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";

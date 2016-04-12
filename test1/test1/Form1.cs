@@ -290,6 +290,7 @@ namespace test1
                     sample_rate = pWave.nSamplesPerSec;
 
                     sample_size = pWave.wBitsPerSample;
+
                     channels = pWave.nChannels;
                     lstart = Avi.AVIStreamStart(astream.ToInt32());
                     astream_i = lstart;
@@ -887,6 +888,7 @@ namespace test1
         {
             localIP = local;
             peerIP = ipaddr;
+
             peer_no = 0;
             if(peerIP[0]!="")
             {
@@ -970,7 +972,16 @@ namespace test1
         }
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)   
         {
-            
+
+            if ((string)e.UserState=="Receiving packet")
+            {
+     
+            }
+            else
+            {
+
+            }
+
             
             if ((string)e.UserState == "Display test ppm")
             {                                                          
@@ -1001,6 +1012,7 @@ namespace test1
                                 }
                                 catch(System.Exception ex)
                                 {
+
                                 }
                             }
                         }               
