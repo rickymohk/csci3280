@@ -50,6 +50,7 @@ namespace test1
         private Byte[][] abuf;
         private string songList_path;
         private int delete;
+        private string input = string.Empty;
 
 
         private void trackBar1_Scroll(object sender, EventArgs e)
@@ -127,8 +128,7 @@ namespace test1
             if (hasAudio && abuf[abuf_i] != null)
             {
                 aPlayer.Volume = vol;
-                toolStripStatusLabel1.Text = aPlayer.Volume.Left.ToString();
-                toolStripStatusLabel2.Text = aPlayer.Volume.Right.ToString();
+
                 count2++;
 
                 aPlayer.Write(abuf[abuf_i]);
@@ -290,7 +290,6 @@ namespace test1
                     sample_rate = pWave.nSamplesPerSec;
 
                     sample_size = pWave.wBitsPerSample;
-                    toolStripStatusLabel1.Text = sample_size.ToString();
                     channels = pWave.nChannels;
                     lstart = Avi.AVIStreamStart(astream.ToInt32());
                     astream_i = lstart;
@@ -397,6 +396,7 @@ namespace test1
                     {
                         avi_path = openFileDialog1.FileName;
                         avi = 0;
+                        info.Text = Path.GetFileNameWithoutExtension(avi_path);
                     }
 
                 }
@@ -584,6 +584,112 @@ namespace test1
             avi = 0;
             button1.Text = "Play";
             info.Text = "Song: " + songList.Rows[e.RowIndex].Cells[1].Value.ToString() + " Singer: " + songList.Rows[e.RowIndex].Cells[2].Value.ToString() + " Album: " + songList.Rows[e.RowIndex].Cells[3].Value.ToString();
+        }
+
+        private void toolStripStatusLabel1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void SearchList_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void SearchBox_TextChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void Search_Click(object sender, EventArgs e)
+        {
+            for (int i = SearchList.Rows.Count - 2; i >= 0; i--)
+            {
+                SearchList.Rows.RemoveAt(i);
+            }
+            input = SearchBox.Text.Trim();
+            string[] delimiterChars = { "," };
+            string line;
+            var line_number = new List<string>();
+            
+            string[] words = input.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
+            using (StreamReader file = new StreamReader(songList_path))
+            {
+                foreach (string word in words)
+                {
+                    
+                    int count = 0;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        string[] delimiterWord = { "\' \'", "\'", "\n" };
+                        string[] temp_word = line.Split(delimiterWord, StringSplitOptions.RemoveEmptyEntries);
+                        int j = 0;
+                        foreach(string s in temp_word)
+                        {
+ //                   MessageBox.Show(s);
+                            if (j == 0)
+                            {
+                                j++;
+                                continue;
+                            }
+                            
+                            int flag = 1;
+                            if (s.IndexOf(word, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                            {
+                                foreach (string number in line_number)
+                                {
+                                    if (count.ToString() == number)
+                                    {
+                                        flag = 0;
+                                        break;
+                                    }
+                                }
+                                if (flag == 1)
+                                {
+                                    line_number.Add(count.ToString());
+                                }
+                            }
+
+
+                        }
+                        
+                        count++;
+                    }
+                    file.DiscardBufferedData();
+                    file.BaseStream.Seek(0, SeekOrigin.Begin);
+                    file.BaseStream.Position = 0;
+
+                }
+            }
+            int temp = 0;
+            foreach (string number in line_number)
+            {
+                
+                Int32.TryParse(number, out temp);
+                DataGridViewRow row = (DataGridViewRow)SearchList.Rows[0].Clone();
+                row.Cells[0].Value = songList.Rows[temp].Cells[0].Value;
+                row.Cells[1].Value = songList.Rows[temp].Cells[1].Value;
+                row.Cells[2].Value = songList.Rows[temp].Cells[2].Value;
+                row.Cells[3].Value = songList.Rows[temp].Cells[3].Value;
+                SearchList.Rows.Add(row);
+            }
+
+        }
+
+        private void songList_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void SearchList_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            t.Stop();
+            aStop();
+            int load = SearchList.SelectedRows[0].Index;
+            avi_path = SearchList.Rows[load].Cells[0].Value.ToString();
+            avi = 0;
+            button1.Text = "Play";
+            info.Text = "Song: " + SearchList.Rows[e.RowIndex].Cells[1].Value.ToString() + " Singer: " + SearchList.Rows[e.RowIndex].Cells[2].Value.ToString() + " Album: " + SearchList.Rows[e.RowIndex].Cells[3].Value.ToString();
         }
 
         private byte[] testppm;
@@ -781,8 +887,6 @@ namespace test1
         {
             localIP = local;
             peerIP = ipaddr;
-            toolStripStatusLabel1.Text = peerIP[0];
-            toolStripStatusLabel2.Text = peerIP[1];
             peer_no = 0;
             if(peerIP[0]!="")
             {
@@ -866,15 +970,7 @@ namespace test1
         }
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)   
         {
-            if ((string)e.UserState=="Receiving packet")
-            {
-                toolStripStatusLabel2.Text = (string)e.UserState;
-            }
-            else
-            {
-                toolStripStatusLabel2.Text = "";
-                textBox1.Text = (string)e.UserState;
-            }
+            
             
             if ((string)e.UserState == "Display test ppm")
             {                                                          
@@ -905,7 +1001,6 @@ namespace test1
                                 }
                                 catch(System.Exception ex)
                                 {
-                                    textBox1.Text = i.ToString() + j.ToString();
                                 }
                             }
                         }               

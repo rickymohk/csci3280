@@ -49,23 +49,27 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.deleteList = new System.Windows.Forms.Button();
             this.info = new System.Windows.Forms.Label();
+            this.Search = new System.Windows.Forms.Button();
+            this.SearchBox = new System.Windows.Forms.TextBox();
+            this.SearchList = new System.Windows.Forms.DataGridView();
+            this.search_path = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Search_Title = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Search_Singer = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Serach_Album = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.songList)).BeginInit();
             this.flowLayoutPanel2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.menuStrip2.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
-            this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SearchList)).BeginInit();
             this.SuspendLayout();
             // 
             // saveScreenShot
@@ -88,7 +92,7 @@
             // 
             this.addSong.Dock = System.Windows.Forms.DockStyle.Fill;
             this.addSong.Enabled = false;
-            this.addSong.Location = new System.Drawing.Point(385, 279);
+            this.addSong.Location = new System.Drawing.Point(376, 279);
             this.addSong.Name = "addSong";
             this.addSong.Size = new System.Drawing.Size(137, 31);
             this.addSong.TabIndex = 15;
@@ -108,16 +112,17 @@
             this.album});
             this.tableLayoutPanel1.SetColumnSpan(this.songList, 2);
             this.songList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.songList.Location = new System.Drawing.Point(385, 31);
+            this.songList.Location = new System.Drawing.Point(376, 31);
             this.songList.Name = "songList";
             this.songList.ReadOnly = true;
             this.songList.RowHeadersVisible = false;
             this.tableLayoutPanel1.SetRowSpan(this.songList, 2);
             this.songList.RowTemplate.Height = 24;
             this.songList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.songList.Size = new System.Drawing.Size(271, 242);
+            this.songList.Size = new System.Drawing.Size(280, 242);
             this.songList.TabIndex = 14;
             this.songList.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.songList_CellClick_1);
+            this.songList.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.songList_CellContentClick);
             this.songList.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.songList_CellDoubleClick);
             // 
             // path
@@ -231,7 +236,7 @@
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 279);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(281, 31);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(274, 31);
             this.flowLayoutPanel1.TabIndex = 12;
             // 
             // button1
@@ -240,7 +245,7 @@
             this.button1.AutoSize = true;
             this.button1.Location = new System.Drawing.Point(3, 3);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(50, 28);
+            this.button1.Size = new System.Drawing.Size(70, 28);
             this.button1.TabIndex = 1;
             this.button1.Text = "Play";
             this.button1.UseVisualStyleBackColor = true;
@@ -249,7 +254,7 @@
             // button3
             // 
             this.button3.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.button3.Location = new System.Drawing.Point(59, 3);
+            this.button3.Location = new System.Drawing.Point(79, 3);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(100, 28);
             this.button3.TabIndex = 5;
@@ -260,47 +265,13 @@
             // trackBar1
             // 
             this.trackBar1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.trackBar1.Location = new System.Drawing.Point(290, 279);
+            this.trackBar1.Location = new System.Drawing.Point(283, 279);
             this.trackBar1.Maximum = 100;
             this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(89, 31);
+            this.trackBar1.Size = new System.Drawing.Size(87, 31);
             this.trackBar1.TabIndex = 10;
             this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
-            // 
-            // textBox1
-            // 
-            this.tableLayoutPanel1.SetColumnSpan(this.textBox1, 4);
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Location = new System.Drawing.Point(3, 337);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(376, 179);
-            this.textBox1.TabIndex = 9;
-            // 
-            // statusStrip1
-            // 
-            this.tableLayoutPanel1.SetColumnSpan(this.statusStrip1, 4);
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1,
-            this.toolStripStatusLabel2});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 313);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(382, 21);
-            this.statusStrip1.TabIndex = 6;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
-            // toolStripStatusLabel1
-            // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(129, 16);
-            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
-            // 
-            // toolStripStatusLabel2
-            // 
-            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-            this.toolStripStatusLabel2.Size = new System.Drawing.Size(129, 16);
-            this.toolStripStatusLabel2.Text = "toolStripStatusLabel2";
             // 
             // pictureBox1
             // 
@@ -309,7 +280,7 @@
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox1.Location = new System.Drawing.Point(3, 51);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(376, 222);
+            this.pictureBox1.Size = new System.Drawing.Size(367, 222);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
@@ -325,8 +296,6 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.Controls.Add(this.pictureBox1, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.statusStrip1, 0, 4);
-            this.tableLayoutPanel1.Controls.Add(this.textBox1, 0, 5);
             this.tableLayoutPanel1.Controls.Add(this.trackBar1, 3, 3);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel2, 0, 0);
@@ -334,6 +303,10 @@
             this.tableLayoutPanel1.Controls.Add(this.addSong, 4, 3);
             this.tableLayoutPanel1.Controls.Add(this.songList, 4, 1);
             this.tableLayoutPanel1.Controls.Add(this.info, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.Search, 5, 4);
+            this.tableLayoutPanel1.Controls.Add(this.SearchBox, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.SearchList, 0, 5);
+            this.tableLayoutPanel1.Controls.Add(this.label1, 3, 4);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -342,8 +315,8 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 21F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 185F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 177F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(659, 519);
             this.tableLayoutPanel1.TabIndex = 0;
@@ -353,9 +326,9 @@
             // 
             this.deleteList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.deleteList.Enabled = false;
-            this.deleteList.Location = new System.Drawing.Point(528, 279);
+            this.deleteList.Location = new System.Drawing.Point(519, 279);
             this.deleteList.Name = "deleteList";
-            this.deleteList.Size = new System.Drawing.Size(128, 31);
+            this.deleteList.Size = new System.Drawing.Size(137, 31);
             this.deleteList.TabIndex = 16;
             this.deleteList.Text = "Delete";
             this.deleteList.UseVisualStyleBackColor = true;
@@ -369,10 +342,95 @@
             this.info.Dock = System.Windows.Forms.DockStyle.Fill;
             this.info.Location = new System.Drawing.Point(3, 28);
             this.info.Name = "info";
-            this.info.Size = new System.Drawing.Size(376, 20);
+            this.info.Size = new System.Drawing.Size(367, 20);
             this.info.TabIndex = 17;
             this.info.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.info.Click += new System.EventHandler(this.label1_Click);
+            // 
+            // Search
+            // 
+            this.Search.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Search.Location = new System.Drawing.Point(519, 316);
+            this.Search.Name = "Search";
+            this.Search.Size = new System.Drawing.Size(137, 23);
+            this.Search.TabIndex = 18;
+            this.Search.Text = "Search";
+            this.Search.UseVisualStyleBackColor = true;
+            this.Search.Click += new System.EventHandler(this.Search_Click);
+            // 
+            // SearchBox
+            // 
+            this.tableLayoutPanel1.SetColumnSpan(this.SearchBox, 3);
+            this.SearchBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SearchBox.Location = new System.Drawing.Point(3, 316);
+            this.SearchBox.Name = "SearchBox";
+            this.SearchBox.Size = new System.Drawing.Size(274, 22);
+            this.SearchBox.TabIndex = 19;
+            this.SearchBox.TextChanged += new System.EventHandler(this.SearchBox_TextChanged);
+            // 
+            // SearchList
+            // 
+            this.SearchList.AllowUserToOrderColumns = true;
+            this.SearchList.BackgroundColor = System.Drawing.Color.GhostWhite;
+            this.SearchList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.SearchList.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.search_path,
+            this.Search_Title,
+            this.Search_Singer,
+            this.Serach_Album});
+            this.tableLayoutPanel1.SetColumnSpan(this.SearchList, 6);
+            this.SearchList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SearchList.GridColor = System.Drawing.SystemColors.ActiveCaption;
+            this.SearchList.Location = new System.Drawing.Point(3, 345);
+            this.SearchList.Name = "SearchList";
+            this.SearchList.ReadOnly = true;
+            this.SearchList.RowHeadersVisible = false;
+            this.SearchList.RowTemplate.Height = 24;
+            this.SearchList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.SearchList.Size = new System.Drawing.Size(653, 171);
+            this.SearchList.TabIndex = 20;
+            this.SearchList.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SearchList_CellContentClick);
+            this.SearchList.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SearchList_CellDoubleClick);
+            // 
+            // search_path
+            // 
+            this.search_path.HeaderText = "Path";
+            this.search_path.Name = "search_path";
+            this.search_path.ReadOnly = true;
+            this.search_path.Visible = false;
+            this.search_path.Width = 200;
+            // 
+            // Search_Title
+            // 
+            this.Search_Title.HeaderText = "Title";
+            this.Search_Title.Name = "Search_Title";
+            this.Search_Title.ReadOnly = true;
+            this.Search_Title.Width = 250;
+            // 
+            // Search_Singer
+            // 
+            this.Search_Singer.HeaderText = "Singer";
+            this.Search_Singer.Name = "Search_Singer";
+            this.Search_Singer.ReadOnly = true;
+            this.Search_Singer.Width = 200;
+            // 
+            // Serach_Album
+            // 
+            this.Serach_Album.HeaderText = "Album";
+            this.Serach_Album.Name = "Serach_Album";
+            this.Serach_Album.ReadOnly = true;
+            this.Serach_Album.Width = 200;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.tableLayoutPanel1.SetColumnSpan(this.label1, 2);
+            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label1.Location = new System.Drawing.Point(283, 313);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(230, 29);
+            this.label1.TabIndex = 21;
+            this.label1.Text = "Keywords should be divided by comma (e.g. ABC,DEF,GHI)";
             // 
             // Form1
             // 
@@ -394,11 +452,10 @@
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SearchList)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -415,10 +472,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn album;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TrackBar trackBar1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Button button1;
@@ -433,6 +486,14 @@
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private System.Windows.Forms.Button deleteList;
         private System.Windows.Forms.Label info;
+        private System.Windows.Forms.Button Search;
+        private System.Windows.Forms.TextBox SearchBox;
+        private System.Windows.Forms.DataGridView SearchList;
+        private System.Windows.Forms.DataGridViewTextBoxColumn search_path;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Search_Title;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Search_Singer;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Serach_Album;
+        private System.Windows.Forms.Label label1;
     }
 }
 
