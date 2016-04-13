@@ -578,13 +578,20 @@ namespace test1
 
         private void songList_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            t.Stop();
-            aStop();
-            int load = songList.SelectedRows[0].Index;
-            avi_path = songList.Rows[load].Cells[0].Value.ToString();
-            avi = 0;
-            button1.Text = "Play";
-            info.Text = "Song: " + songList.Rows[e.RowIndex].Cells[1].Value.ToString() + " Singer: " + songList.Rows[e.RowIndex].Cells[2].Value.ToString() + " Album: " + songList.Rows[e.RowIndex].Cells[3].Value.ToString();
+            if (e.RowIndex<0 || ((songList.SelectedRows[0].Cells[0].Value== null)&& (songList.SelectedRows[0].Cells[1].Value== null)&& (songList.SelectedRows[0].Cells[2].Value== null)&& (songList.SelectedRows[0].Cells[3].Value== null)))
+            {
+                MessageBox.Show("Row is empty.");
+           }
+           else
+            {
+                int load = songList.SelectedRows[0].Index;
+                t.Stop();
+                aStop();
+                avi_path = songList.Rows[load].Cells[0].Value.ToString();
+                avi = 0;
+                button1.Text = "Play";
+                info.Text = "Song: " + songList.Rows[e.RowIndex].Cells[1].Value.ToString() + " Singer: " + songList.Rows[e.RowIndex].Cells[2].Value.ToString() + " Album: " + songList.Rows[e.RowIndex].Cells[3].Value.ToString();
+            }
         }
 
         private void toolStripStatusLabel1_Click(object sender, EventArgs e)
@@ -612,17 +619,19 @@ namespace test1
             string[] delimiterChars = { "," };
             string line;
             var line_number = new List<string>();
-            
+            string[] delimiterWord = { "\' \'", "\'", "\n" };
+
             string[] words = input.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
+            int count;
             using (StreamReader file = new StreamReader(songList_path))
             {
-                int count = 0;
+                count = 0;
                 while ((line = file.ReadLine()) != null)
                 {
                     int flag = 0;
                     foreach (string word in words)
                     {
-                        string[] delimiterWord = { "\' \'", "\'", "\n" };
+                        
                         string[] temp_word = line.Split(delimiterWord, StringSplitOptions.RemoveEmptyEntries);
                         int j = 0;
                         foreach (string s in temp_word)
@@ -635,7 +644,6 @@ namespace test1
 
                             if (s.IndexOf(word, StringComparison.CurrentCultureIgnoreCase) >= 0)
                             {
-                                MessageBox.Show(count.ToString());
                                 line_number.Add(count.ToString());
                                 flag = 1;
                                 break;
@@ -651,16 +659,36 @@ namespace test1
                 }
             }
             int temp = 0;
-            foreach (string number in line_number)
+            
+
+            string[] lines = System.IO.File.ReadAllLines(songList_path);
+            count = 0;
+            int k = 0;
+            while(k<line_number.Count)
             {
-                
+                string number = line_number[k];
                 Int32.TryParse(number, out temp);
+
+                string load = lines[temp];
                 DataGridViewRow row = (DataGridViewRow)SearchList.Rows[0].Clone();
-                row.Cells[0].Value = songList.Rows[temp].Cells[0].Value;
-                row.Cells[1].Value = songList.Rows[temp].Cells[1].Value;
-                row.Cells[2].Value = songList.Rows[temp].Cells[2].Value;
-                row.Cells[3].Value = songList.Rows[temp].Cells[3].Value;
+                string[] temp_word = load.Split(delimiterWord, StringSplitOptions.RemoveEmptyEntries);
+                int i = 0;
+                foreach (string s in temp_word)
+                {
+                    if (s == "NULL")
+                    {
+                        row.Cells[i].Value = "N/A";
+                    }
+                    else
+                    { 
+                        row.Cells[i].Value = s;
+                        
+                    }
+                    i++;
+
+                }
                 SearchList.Rows.Add(row);
+                k++;
             }
 
         }
@@ -672,13 +700,20 @@ namespace test1
 
         private void SearchList_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            t.Stop();
-            aStop();
-            int load = SearchList.SelectedRows[0].Index;
-            avi_path = SearchList.Rows[load].Cells[0].Value.ToString();
-            avi = 0;
-            button1.Text = "Play";
-            info.Text = "Song: " + SearchList.Rows[e.RowIndex].Cells[1].Value.ToString() + " Singer: " + SearchList.Rows[e.RowIndex].Cells[2].Value.ToString() + " Album: " + SearchList.Rows[e.RowIndex].Cells[3].Value.ToString();
+            if (e.RowIndex < 0 || ((SearchList.SelectedRows[0].Cells[0].Value == null) && (SearchList.SelectedRows[0].Cells[1].Value == null) && (SearchList.SelectedRows[0].Cells[2].Value == null) && (SearchList.SelectedRows[0].Cells[3].Value == null)))
+            {
+                MessageBox.Show("Row is empty.");
+            }
+            else {
+                t.Stop();
+                aStop();
+                int load = SearchList.SelectedRows[0].Index;
+                avi_path = SearchList.Rows[load].Cells[0].Value.ToString();
+                avi = 0;
+                button1.Text = "Play";
+                info.Text = "Song: " + SearchList.Rows[e.RowIndex].Cells[1].Value.ToString() + " Singer: " + SearchList.Rows[e.RowIndex].Cells[2].Value.ToString() + " Album: " + SearchList.Rows[e.RowIndex].Cells[3].Value.ToString();
+
+            }
         }
 
         private byte[] testppm;
