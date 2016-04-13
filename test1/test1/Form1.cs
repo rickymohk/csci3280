@@ -616,49 +616,37 @@ namespace test1
             string[] words = input.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
             using (StreamReader file = new StreamReader(songList_path))
             {
-                foreach (string word in words)
+                int count = 0;
+                while ((line = file.ReadLine()) != null)
                 {
-                    
-                    int count = 0;
-                    while ((line = file.ReadLine()) != null)
+                    int flag = 0;
+                    foreach (string word in words)
                     {
                         string[] delimiterWord = { "\' \'", "\'", "\n" };
                         string[] temp_word = line.Split(delimiterWord, StringSplitOptions.RemoveEmptyEntries);
                         int j = 0;
-                        foreach(string s in temp_word)
+                        foreach (string s in temp_word)
                         {
- //                   MessageBox.Show(s);
                             if (j == 0)
                             {
                                 j++;
                                 continue;
                             }
-                            
-                            int flag = 1;
+
                             if (s.IndexOf(word, StringComparison.CurrentCultureIgnoreCase) >= 0)
                             {
-                                foreach (string number in line_number)
-                                {
-                                    if (count.ToString() == number)
-                                    {
-                                        flag = 0;
-                                        break;
-                                    }
-                                }
-                                if (flag == 1)
-                                {
-                                    line_number.Add(count.ToString());
-                                }
+                                MessageBox.Show(count.ToString());
+                                line_number.Add(count.ToString());
+                                flag = 1;
+                                break;
                             }
-
-
                         }
-                        
-                        count++;
-                    }
-                    file.DiscardBufferedData();
-                    file.BaseStream.Seek(0, SeekOrigin.Begin);
-                    file.BaseStream.Position = 0;
+                        if (flag == 1)
+                        {
+                            break;
+                        }
+                    }   
+                    count++;
 
                 }
             }
